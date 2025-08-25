@@ -1,0 +1,84 @@
+1 26 2p 709 expFe.txt saida.out 1 
+2 8  1s 531     
+3   
+4   
+
+223     10      0.001           scanmode,dispmode,ftolerance
+0       0       6       4       linitial,lnum,msorder,raorder
+6       0       3       0       layers,finals,fitmath,trymax
+14.31   14.31   0.0             kmin,kmax,kstep (per angstrom)
+12.0    69.0    3.0             dthetamin,dthetamax,dthetastep (degree)
+2.5     359.5   3.0             dphimin,dphimax,dphistep (degree)
+0.0     0.0     1               ltheta, lphi, beampol (degree)
+0.0     0.0     3.0             mtheta, mphi, acceptang (degree)
+9       11.3    1.00           radius,depth,lattice(angs)
+24      4.7     7.88    187.444 valence,bandgap(eV),density(g/cm3), mweight (amu)
+55.845  0.0    0.00   0.000   efective weight for kind 1-4 (amu)
+0       0.0     0.0             ATA, ATAWeight1, ATAWeight2, t=(1-ATAWeight)*t1+ATAWeight*t2)
+0.0     0.0     0.0     0.0     magnetization amplitude for kind 1-4
+0       105.0   300.0   0.001   vinner(eV),tdebye,tsample(K),pathcut
+0.0     0.0     0.0             fit try for vinner, tdebye and lattice
+
+26 1  (1 ou 0, emitindo ou não emitindo) 1
+unita(len ang)
+2.866     90.000000
+unitb(len ang)
+2.866      0.000000
+origin(len,ang) (in Angstrons)
+0      0.000000
+interlayer spacing (A)
+0
+///
+26 1  (1 ou 0, emitindo ou não emitindo) 2
+unita(len ang)
+2.866     90.000000
+unitb(len ang)
+2.866      0.000000
+origin(len,ang) (in Angstrons)
+2      45.000000
+interlayer spacing (A)
+1.433
+///
+26 1  (1 ou 0, emitindo ou não emitindo) 3
+unita(len ang)
+2.866     90.000000
+unitb(len ang)
+2.866      0.000000
+origin(len,ang) (in Angstrons)
+0      0.000000
+interlayer spacing (A)
+1.433
+///
+26 1  (1 ou 0, emitindo ou não emitindo) 4
+unita(len ang)
+2.866     90.000000
+unitb(len ang)
+2.866      0.000000
+origin(len,ang) (in Angstrons)
+0      0.000000
+interlayer spacing (A)
+1.433
+///
+26 1  (1 ou 0, emitindo ou não emitindo) 5
+unita(len ang)
+2.866     90.000000
+unitb(len ang)
+2.866      0.000000
+origin(len,ang) (in Angstrons)
+2      45.000000
+interlayer spacing (A)
+1.433
+///
+8 0  (1 ou 0, emitindo ou não emitindo) 6
+unita(len ang)
+2.866     90.000000
+unitb(len ang)
+2.866      0.000000
+origin(len,ang) (in Angstrons)
+0      0.000000
+interlayer spacing (A)
+1.433
+
+
+
+

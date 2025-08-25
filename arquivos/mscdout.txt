@@ -1,0 +1,12 @@
+   741    11     4     datakind beginning-row linenumbers
+-----------------------------------------------------------------
+Calculation of photoelectron diffraction and dichroism
+MSCD Parallel  Version 1.37 Yufeng Chen and Michel A Van Hove
+Lawrence Berkeley National Laboratory (LBNL), Berkeley, CA 94720
+Copyright (c) Van Hove Group 1997-1998. All rights reserved
+-----------------------------------------------------------------
+
+ Job report
+
+   1   output_header.txt
+       result saved in file saida.out

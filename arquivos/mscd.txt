@@ -1,0 +1,56 @@
+1	1	0	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 2.866     60.000000			unita(len ang) (fcc (111) structure)
+ 4.0000      0.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 0						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+2	1	0	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 2.866     60.000000			unita(len ang) (fcc (111) structure)
+ 4.0000      0.000000			unitb(len ang) (in unit of lattice)
+ 1.5      20.000000			origin(len,ang) (in unit of lattice)
+ 1.5						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+3	2	0	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 2.866    60.000000			unita(len ang) (fcc (111) structure)
+ 4.0000      0.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 1.5						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+4	2	0	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 2.866    60.000000			unita(len ang) (fcc (111) structure)
+ 4.0000      0.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 2.0						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+5	3	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 2.866    60.000000			unita(len ang) (fcc (111) structure)
+ 4.0000      0.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 1.5						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+6	1	0	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 2.866    60.000000			unita(len ang) (fcc (111) structure)
+ 4.0000      0.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 1.5						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+7	4	0	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 2.866    60.000000			unita(len ang) (fcc (111) structure)
+ 4.0000      0.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 1.5						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+8	4	0	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 2.866    60.000000			unita(len ang) (fcc (111) structure)
+ 4.0000      0.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 1.5						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
