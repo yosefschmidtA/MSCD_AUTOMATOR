@@ -25,16 +25,31 @@ fi
 
 # 3. Move o arquivo de entrada para a pasta de trabalho
 echo "MOVENDO O ARQUIVO '$ARQUIVO_DE_ENTRADA' PARA '$PASTA_DE_TRABALHO'..."
-mv "$ARQUIVO_DE_ENTRADA" "$PASTA_DE_TRABALHO"/
+cp "$ARQUIVO_DE_ENTRADA" "$PASTA_DE_TRABALHO"/
 
 # 4. Navega para a pasta de trabalho
 cd "$PASTA_DE_TRABALHO"
 echo "DIRETORIO ALTERADO PARA '$PASTA_DE_TRABALHO'."
 
+LIB_PATH=$(find / -name "libmpi_cxx.so.1" 2>/dev/null | head -n 1)
+
+# Verifica se a biblioteca foi encontrada
+if [ -z "$LIB_PATH" ]; then
+    echo "ERRO: Biblioteca 'libmpi_cxx.so.1' não encontrada. Verifique a instalação do MPI."
+    exit 1
+fi
+
+# Extrai o diretório do caminho completo e exporta
+DIR_PATH=$(dirname "$LIB_PATH")
+export LD_LIBRARY_PATH="$DIR_PATH:$LD_LIBRARY_PATH"
+
+echo "BIBLIOTECA MPI ENCONTRADA EM: $DIR_PATH"
+echo "VARIÁVEL LD_LIBRARY_PATH EXPORTADA."
 # 5. Executa a limpeza de arquivos antigos
 echo "REALIZANDO A LIMPEZA DE ARQUIVOS ANTIGOS..."
 find . -maxdepth 1 \( -name "ps*" -o -name "rm*" \) -not -name "rmconv" -not -name "rmconv.cpp" -not -name "rmconv.o" -not -name "psconv" -not -name "psconv.o" -not -name "psrm.x" -delete
 rm output_header.txt
+rm -f mufftin*.d
 echo "LIMPEZA CONCLUIDA."
 
 # 6. Executa a sequência de scripts Python
@@ -50,7 +65,7 @@ sleep 3
 
 # 7. Executa o programa randmscd
 echo "EXECUTANDO O PROGRAMA RANDMSCD..."
-mpirun -np 5 ./randmscd_parallel output_header.txt
+mpirun -np 10 randmscd_parallel output_header.txt
 
 # 8. Copia o arquivo de entrada de volta para a pasta principal
 echo "COPIANDO O ARQUIVO '$ARQUIVO_DE_ENTRADA' DE VOLTA PARA O DIRETORIO PRINCIPAL..."

@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
-
 def calcular_r_factor(df):
     resultados = []
     angulos = []
@@ -68,19 +67,17 @@ def calcular_r_factor(df):
         r_factor_total = None
 
     return resultados, angulos, r_factor_medio, r_factor_total
-
-
 def process_file(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
     data = []
     theta_value = None
+    lista_temporaria = []
 
     for i in range(26, len(lines)):
         line = lines[i].strip()
 
-        # Parar a leitura ao encontrar "fitted parameters ("
         if "fitted parameters (" in line:
             break
 
@@ -88,15 +85,34 @@ def process_file(file_path):
             parts = line.split()
 
             if len(parts) == 7:
+                # Encontrou um novo Theta, processa os dados acumulados
+                if lista_temporaria:
+                    intensi2_values = [item[1] for item in lista_temporaria]
+                    media_intensi2 = sum(intensi2_values) / len(intensi2_values)
+
+                    for phi, intensi1, intensi2, intensityexp in lista_temporaria:
+                        intensitycal = (intensi1 - media_intensi2) / media_intensi2
+                        data.append([phi, intensitycal, theta_value, intensityexp, True])
+
+                    lista_temporaria = []
+
                 theta_value = float(parts[3])
 
             elif len(parts) == 5 and theta_value is not None:
                 phi = float(parts[0])
-                intensi1 =float(parts[1])
-                intensi2 =float(parts[2])
-                intensitycal = float((intensi1-intensi2)/intensi2)
+                intensi1 = float(parts[1])
+                intensi2 = float(parts[2])
                 intensityexp = float(parts[4])
-                data.append([phi, intensitycal, theta_value, intensityexp, True])  # Marcar como original
+                lista_temporaria.append((phi, intensi1, intensi2, intensityexp))
+
+    # Depois do loop, processa o último conjunto também
+    if lista_temporaria:
+        intensi2_values = [item[1] for item in lista_temporaria]
+        media_intensi2 = sum(intensi2_values) / len(intensi2_values)
+
+        for phi, intensi1, intensi2, intensityexp in lista_temporaria:
+            intensitycal = (intensi1 - media_intensi2) / media_intensi2
+            data.append([phi, intensitycal, theta_value, intensityexp, True])
 
     df = pd.DataFrame(data, columns=['Phi', 'intensitycal', 'Theta', 'intensityexp', 'IsOriginal'])
     resultados, angulos, r_factor_medio, r_factor_total = calcular_r_factor(df)
@@ -180,66 +196,84 @@ def interpolate_data(df, resolution=1000):
 
 
 def plot_polar_interpolated(df, resolution=500, line_position=0.5, my_variable=None, save_path=None):
-    # Interpolar os dados
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    # 1. Manter apenas a banda real esquerda (90°–270°)
+    df_left = df[(df['Phi'] >= 90) & (df['Phi'] <= 270)].copy()
+
+    # 2. Criar a banda direita por espelhamento em 180°
+    df_right = df_left.copy()
+    df_right['Phi'] = (df_right['Phi'] + 180) % 360
+
+    # 3. Eliminar os dados reais da direita (para evitar sobreposição)
+    df_clean = df[(df['Phi'] >= 90) & (df['Phi'] <= 270)].copy()
+
+    # 4. Montar o DataFrame final com simetria
+    df_plot = pd.concat([df_clean, df_right], ignore_index=True)
+
+    def rotate_phi_for_plot(df_plot, rotation_angle):
+        """
+        Mesma rotação, mas garante que Phi = 0 esteja presente **apenas** para plotagem.
+        """
+        
+        df_plot['Phi'] = (df_plot['Phi'] + rotation_angle) % 360
+
+        if not np.isclose(df_plot['Phi'].min(), 0):
+            df_0 = df_plot[df_plot['Phi'] == df_plot['Phi'].min()].copy()
+            df_0['Phi'] = 0
+            df_plot = pd.concat([df_plot, df_0], ignore_index=True)
+
+        return df_plot
+    df_plot = rotate_phi_for_plot(df_plot, 0)
+
+    # Interpolação e gráfico polar
     plt.ion()
-    phi_grid, theta_grid, intensity_grid = interpolate_data(df, resolution)
+    phi_grid, theta_grid, intensity_grid = interpolate_data(df_plot, resolution)
 
-    # Criando o gráfico polar
     fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(10, 8), dpi=100)
-
-    # Plotando a intensidade interpolada
     c = ax.pcolormesh(phi_grid, theta_grid, intensity_grid, shading='gouraud', cmap='afmhot')
 
-    # Definir o limite máximo do eixo theta com base no maior valor de theta nos dados
-    max_theta = df['Theta'].max()  # Maior valor de theta presente nos dados
-    ax.set_ylim(0, np.radians(max_theta))  # Limitar o eixo radial até o maior valor de theta
+    max_theta = df['Theta'].max()
+    ax.set_ylim(0, np.radians(max_theta))
+    theta_ticks = np.linspace(0, max_theta, num=6)
+    ax.set_yticks(np.radians(theta_ticks))
+    ax.set_yticklabels([f'{int(t)}°' for t in theta_ticks])
 
-    # Adiciona rótulos para os ângulos theta, ajustados conforme o máximo de theta nos dados
-    theta_ticks = np.linspace(0, max_theta, num=6)  # Definir até 6 ticks no eixo theta
-    ax.set_yticks(np.radians(theta_ticks))  # Converte para radianos
-    ax.set_yticklabels([f'{int(tick)}°' for tick in theta_ticks])  # Exibe como graus
-
-    # Adicionando a barra de cores
     cbar = fig.colorbar(c, ax=ax, label='', pad=0.08)
     cbar.set_label('', fontsize=22, fontweight='bold')
-    cbar.ax.yaxis.set_tick_params(labelsize=30)  # Ajusta o tamanho da fonte
+    cbar.ax.yaxis.set_tick_params(labelsize=30)
     for label in cbar.ax.get_yticklabels():
-        label.set_fontweight('bold')  # Deixa os valores em negrito
-    # Adiciona a variável fora do gráfico, no canto inferior direito
+        label.set_fontweight('bold')
+
     if my_variable is not None:
-        # Aqui estamos usando coordenadas relativas à figura (0 a 1)
-        fig.text(0.87, 0.03, f'R-factor: {my_variable}', fontsize=34, color='black', ha='right', va='bottom',
-                 fontweight='bold')
-    Anysotropy = "Anisotropy"
-    fig.text(0.94, 0.9,  Anysotropy, fontsize=34, color='black', ha='right', va='bottom',
-             fontweight='bold')
-    # Definir manualmente os ângulos de Phi (Xticks)
-    phi_ticks = np.linspace(0, 2 * np.pi, num=9)[:-1]  # Remove o último valor (360°)
-    phi_labels = [f'{int(np.degrees(tick))}°' for tick in phi_ticks]  # Cria os rótulos
+        fig.text(0.87, 0.03, f'R-factor: {my_variable}', fontsize=26, color='black', ha='right', va='bottom', fontweight='bold')
+
+    fig.text(0.94, 0.9, "Anisotropy", fontsize=34, color='black', ha='right', va='bottom', fontweight='bold')
+
+    phi_ticks = np.linspace(0, 2 * np.pi, num=9)[:-1]
+    phi_labels = [f'{int(np.degrees(tick))}°' for tick in phi_ticks]
     ax.set_xticks(phi_ticks)
     ax.set_xticklabels(phi_labels, fontsize=26, fontweight='bold')
 
-    # Ajustar individualmente os pads de cada rótulo
-    pad_values = [1, -1, 3, 0, -7, -6, -1, -6]  # Valores personalizados para cada rótulo
+    pad_values = [1, -1, 3, 0, -7, -6, -1, -6]
     for label, pad in zip(ax.get_xticklabels(), pad_values):
-        label.set_y(label.get_position()[1] + pad * 0.01)  # Move os rótulos individualmente
+        label.set_y(label.get_position()[1] + pad * 0.01)
 
-    # Afasta os rótulos de Phi
-    ax.tick_params(pad=8)  # Ajuste global para todos os rótulos
+    ax.tick_params(pad=8)
     plt.yticks(fontsize=0, fontweight='bold')
     plt.draw()
 
-    # Salvar a figura, se o caminho de salvamento for fornecido
     if save_path:
-        plt.savefig(save_path, dpi=200, bbox_inches='tight')  # Salva no caminho especificado
+        plt.savefig(save_path, dpi=200, bbox_inches='tight')
 
-    # Exibir a figura por 600 segundos
     plt.pause(600)
 
 
 # Caminho do arquivo
 file_path = './arquivos/saida.out'
-save_path = 'grafico_polar3.png'
+save_path = 'grafico_p.png'
+
 df, r_factor_total = process_file(file_path)
 #r_factor_total=0.276
 my_variable = "{:.3f}".format(r_factor_total)
