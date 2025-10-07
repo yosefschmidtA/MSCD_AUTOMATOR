@@ -11,10 +11,10 @@
 'po'    'ps1.txt'         input potential data filein
 'ps'    'ps1.1.txt'      output phase shift data file
 'rm'    'rm1.txt'      output radial matrix data file
-'ss'    '2p'               subshell and initial state
+'ss'    '3d'               subshell and initial state
 'sb'    '1'             symbol of atom
 'at'    '1'             name of atom
 
 20         1    lnum, output file (0=phase shfit, 1= radial matrix)
 5.0         20.00   0.05    kin, kmax, kstep
-709                     subshell binding energy
+368                     subshell binding energy
