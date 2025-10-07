@@ -1,4 +1,3 @@
-
 import numpy as np
 import math
 import re
@@ -221,20 +220,29 @@ def generate_mscd_phaseshift_input(all_params, output_filename='mscd_phaseshift.
 
     with open(output_filename, 'w') as f:
         f.write("Input gerado automaticamente para MSCD (\n")
-        f.write(f"  {lattice_constant_au:<8.4f}              (Lattice constant (a.u.))\n")
+        f.write(f"  {lattice_constant_au:<8.4f}           (Lattice constant (a.u.))\n")
         f.write(f"  {vec_a[0]:<8.4f}{vec_a[1]:<8.4f}{vec_a[2]:<8.4f}\n")
         f.write(f"  {vec_b[0]:<8.4f}{vec_b[1]:<8.4f}{vec_b[2]:<8.4f}\n")
         f.write(f"  {vec_c[0]:<8.4f}{vec_c[1]:<8.4f}{vec_c[2]:<8.4f}\n")
         f.write(f"   {len(atom_types)}\n")
-        for z_number, basis_atoms in atom_types.items():
+        for z_number, basis_atoms in sorted(atom_types.items()):
             symbol = atomic_symbols.get(z_number, 'X')
             f.write(f"{symbol}\n")
-            f.write(f"   {len(basis_atoms):<2d}{float(z_number):<8.4f} 0.0000 1.0000\n")
+            
+            # --- CORREÇÃO DE FORMATAÇÃO PARA FORTRAN ---
+            num_layers = len(basis_atoms)
+            if num_layers < 10:
+                # Formato que funciona para 1-9 layers (3 espaços antes, 2 depois)
+                f.write(f"   {num_layers}  {float(z_number):<8.4f} 0.0000 1.0000\n")
+            else:
+                # Formato ajustado para 10+ layers (2 espaços antes, 2 depois)
+                f.write(f"  {num_layers}  {float(z_number):<8.4f} 0.0000 1.0000\n")
+
             for atom_coord in basis_atoms:
                 f.write(f"  {atom_coord[0]:<8.4f}{atom_coord[1]:<8.4f}{atom_coord[2]:<8.4f}\n")
         f.write("   3\n")
         f.write("  0.6667\n")
-        f.write("  10\n") 
+        f.write("  10\n")
     print("Arquivo de input do MSCD gerado com sucesso.")
 
 
@@ -254,4 +262,5 @@ if __name__ == "__main__":
     if parametros and element_order:
         generate_mscd_phaseshift_input(parametros, output_filename='cluster.i')
         assemble_mufftin_d(element_order, output_filename='atomic.i')
+
 
