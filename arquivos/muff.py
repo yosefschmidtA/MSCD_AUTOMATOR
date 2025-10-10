@@ -166,7 +166,7 @@ def generate_psrmin_files(element_info_list):
 'sb'    '1'             symbol of atom
 'at'    '1'             name of atom
 
-20         1    lnum, output file (0=phase shfit, 1= radial matrix)
+10         1    lnum, output file (0=phase shfit, 1= radial matrix)
 5.0         20.00   0.05    kin, kmax, kstep
 {energy}                     subshell binding energy
 """
@@ -205,7 +205,7 @@ def run_psrm_sequence(executable_path='./psrm.x'):
 
         # --- Cálculo do Phase Shift (0) ---
         print("  - Configurando para Phase Shift (0)...")
-        content_ps = re.sub(r"^(20\s+)1(\s+lnum.*)$", r"\g<1>0\g<2>", original_content, flags=re.MULTILINE)
+        content_ps = re.sub(r"^(10\s+)1(\s+lnum.*)$", r"\g<1>0\g<2>", original_content, flags=re.MULTILINE)
         with open('psrmin.txt', 'w') as f:
             f.write(content_ps)
         
@@ -215,7 +215,7 @@ def run_psrm_sequence(executable_path='./psrm.x'):
 
         # --- Cálculo da Radial Matrix (1) ---
         print("  - Configurando para Radial Matrix (1)...")
-        content_rm = re.sub(r"^(20\s+)0(\s+lnum.*)$", r"\g<1>1\g<2>", content_ps, flags=re.MULTILINE)
+        content_rm = re.sub(r"^(10\s+)0(\s+lnum.*)$", r"\g<1>1\g<2>", content_ps, flags=re.MULTILINE)
         with open('psrmin.txt', 'w') as f:
             f.write(content_rm)
             

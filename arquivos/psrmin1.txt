@@ -15,6 +15,6 @@
 'sb'    '1'             symbol of atom
 'at'    '1'             name of atom
 
-20         1    lnum, output file (0=phase shfit, 1= radial matrix)
+10         1    lnum, output file (0=phase shfit, 1= radial matrix)
 5.0         20.00   0.05    kin, kmax, kstep
 368                     subshell binding energy

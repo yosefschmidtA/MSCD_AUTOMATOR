@@ -233,10 +233,10 @@ def generate_mscd_phaseshift_input(all_params, output_filename='mscd_phaseshift.
             num_layers = len(basis_atoms)
             if num_layers < 10:
                 # Formato que funciona para 1-9 layers (3 espaços antes, 2 depois)
-                f.write(f"   {num_layers}  {float(z_number):<8.4f} 0.0000 1.0000\n")
+                f.write(f"   {num_layers}  {float(z_number):<8.4f} 0.0000 2.6292\n")
             else:
                 # Formato ajustado para 10+ layers (2 espaços antes, 2 depois)
-                f.write(f"  {num_layers}  {float(z_number):<8.4f} 0.0000 1.0000\n")
+                f.write(f"  {num_layers}  {float(z_number):<8.4f} 0.0000 2.6292\n")
 
             for atom_coord in basis_atoms:
                 f.write(f"  {atom_coord[0]:<8.4f}{atom_coord[1]:<8.4f}{atom_coord[2]:<8.4f}\n")

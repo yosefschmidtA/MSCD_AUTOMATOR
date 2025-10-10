@@ -18,7 +18,7 @@ pe      saida.out            output photoemission data file
 
 223     10       0.001          scanmode,dispmode,ftolerance
 2       0       8       4       linitial,lnum,msorder,raorder
-9      0       3       0       layers,finals,fitmath,trymax
+10      0       3       0       layers,finals,fitmath,trymax
 17.4    17.4    0.0             kmin,kmax,kstep (per angstrom)
 9       78      3.0             dthetamin,dthetamax,dthetastep (degree)
 111.0   231.0   3.0             dphimin,dphimax,dphistep (degree)
@@ -29,7 +29,7 @@ pe      saida.out            output photoemission data file
 107.87  0.0     0.0     0.0     effective weight for kind 1-4 (amu)
 0       0.0     0.0             ATA, ATAWeight1, ATAWeight2, t=(1-ATAWeight)*t1+ATAWeight*t2)
 0.0     0.0     0.0   0.0       magnetization amplitude for kind 1-4
-2.1     104.0   300.0   0.005   vinner(eV),tdebye,tsample(K),pathcut
+0.1     104.0   300.0   0.005   vinner(eV),tdebye,tsample(K),pathcut
 0.0     0.0     0.0             fit try for vinner, tdebye and lattice
 
 1	1	1	0			layer, kind, emitter, lineatom
@@ -45,7 +45,7 @@ pe      saida.out            output photoemission data file
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0.4082232      0.000000			origin(len,ang) (in unit of lattice)
- 0.65						interlayer spacing (unit lattice)
+ 0.6500000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
 3	1	1	0			layer, kind, emitter, lineatom
@@ -53,7 +53,7 @@ pe      saida.out            output photoemission data file
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0.4082232      180.000000			origin(len,ang) (in unit of lattice)
- 0.65						interlayer spacing (unit lattice)
+ 0.7500000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
 4	1	1	0			layer, kind, emitter, lineatom
@@ -61,7 +61,7 @@ pe      saida.out            output photoemission data file
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0      0.000000			origin(len,ang) (in unit of lattice)
- 0.65						interlayer spacing (unit lattice)
+ 0.5200000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
 5	1	1	0			layer, kind, emitter, lineatom
@@ -69,7 +69,7 @@ pe      saida.out            output photoemission data file
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0.4082232      0.000000			origin(len,ang) (in unit of lattice)
- 0.65						interlayer spacing (unit lattice)
+ 0.7200000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
 6	1	1	0			layer, kind, emitter, lineatom
@@ -77,7 +77,7 @@ pe      saida.out            output photoemission data file
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0.4082232      180.000000			origin(len,ang) (in unit of lattice)
- 0.65						interlayer spacing (unit lattice)
+ 0.5700000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
 7	1	1	0			layer, kind, emitter, lineatom
@@ -85,7 +85,7 @@ pe      saida.out            output photoemission data file
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0      0.000000			origin(len,ang) (in unit of lattice)
- 0.65						interlayer spacing (unit lattice)
+ 0.690000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
 8	1	1	0			layer, kind, emitter, lineatom
@@ -93,7 +93,7 @@ pe      saida.out            output photoemission data file
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0.4082232      0.000000			origin(len,ang) (in unit of lattice)
- 0.65						interlayer spacing (unit lattice)
+ 0.570000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
 9	1	1	0			layer, kind, emitter, lineatom
@@ -101,6 +101,14 @@ pe      saida.out            output photoemission data file
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0.4082232      180.000000			origin(len,ang) (in unit of lattice)
- 0.65						interlayer spacing (unit lattice)
+ 0.5000000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+10	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 0.4600000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
