@@ -17,35 +17,28 @@ atomic_symbols = {
     74: 'W'
 }
 
-# --- NOVA FUNÇÃO ---
 def get_lattice_constant_from_header(filename='input_cluster.txt'):
     """Lê o cabeçalho para encontrar o parâmetro de rede (lattice)."""
     print(f"\nProcurando pelo parâmetro de rede (lattice) em: {filename}")
     try:
         with open(filename, 'r') as f:
             for line in f:
-                # A linha de interesse contém 'lattice(angs)'
                 if 'lattice(angs)' in line:
                     parts = line.strip().split()
                     if len(parts) >= 3:
                         lattice_val = float(parts[2])
                         print(f"Parâmetro de rede encontrado: {lattice_val} Angstroms. Este valor será usado como multiplicador.")
                         return lattice_val
-                    else:
-                        print("AVISO: Linha 'lattice(angs)' encontrada, mas malformada. Usando padrão 1.0.")
-                        return 1.0
-                # Para de procurar quando os blocos de camada começam
                 if '///' in line:
                     break
-        print("AVISO: Parâmetro de rede 'lattice(angs)' não encontrado no cabeçalho. Usando padrão 1.0 (unidades em Angstroms).")
+        print("AVISO: Parâmetro de rede 'lattice(angs)' não encontrado. Usando padrão 1.0.")
         return 1.0
     except Exception as e:
-        print(f"ERRO ao ler o parâmetro de rede do cabeçalho: {e}. Usando padrão 1.0.")
+        print(f"ERRO ao ler o parâmetro de rede: {e}. Usando padrão 1.0.")
         return 1.0
 
-# --- FUNÇÃO MODIFICADA ---
 def parse_multi_layer_file(filename='input_cluster.txt', lattice_constant=1.0):
-    """Lê um arquivo com múltiplas layers, aplicando o fator de rede aos comprimentos."""
+    """Lê um arquivo com múltiplas layers, aplicando o fator de rede."""
     print(f"Lendo o arquivo de configuração do cluster: {filename}")
     try:
         with open(filename, 'r') as f:
@@ -68,7 +61,7 @@ def parse_multi_layer_file(filename='input_cluster.txt', lattice_constant=1.0):
                     break
         
         if first_layer_start_index == -1:
-            print("ERRO: Não foi possível encontrar o início dos dados da camada (marcador 'unita').")
+            print("ERRO: Não foi possível encontrar o início dos dados da camada.")
             return None
 
         content = "".join(all_lines[first_layer_start_index:])
@@ -107,7 +100,7 @@ def parse_multi_layer_file(filename='input_cluster.txt', lattice_constant=1.0):
         return None
 
 def get_element_order_from_header(filename='input_cluster.txt'):
-    """Lê o cabeçalho do arquivo para obter a ordem dos elementos para o mufftin.d."""
+    """Lê o cabeçalho para obter a ordem dos elementos."""
     print(f"\nLendo a ordem dos elementos do cabeçalho de: {filename}")
     ordered_atomic_numbers = []
     try:
@@ -127,16 +120,15 @@ def get_element_order_from_header(filename='input_cluster.txt'):
         print(f"Ordem de elementos para mufftin.d definida pelo cabeçalho: {ordered_atomic_numbers}")
         return ordered_atomic_numbers
     except Exception as e:
-        print(f"ERRO ao ler o cabeçalho do arquivo de input: {e}")
+        print(f"ERRO ao ler o cabeçalho: {e}")
         return []
 
-
-def assemble_mufftin_d(ordered_atomic_numbers, output_filename='mufftin.d'):
-    """Monta o arquivo mufftin.d a partir dos arquivos atelem.*."""
+def assemble_mufftin_d(ordered_atomic_numbers, output_filename='atomic.i'):
+    """Monta o arquivo atomic.i a partir dos arquivos atelem.*."""
     print(f"\nMontando o arquivo {output_filename} a partir dos arquivos atelem.*...")
     try:
         if not ordered_atomic_numbers:
-            print("Nenhuma ordem de elemento fornecida para montar o arquivo.")
+            print("Nenhuma ordem de elemento fornecida.")
             return
 
         symbols = [atomic_symbols.get(z, None) for z in ordered_atomic_numbers]
@@ -149,10 +141,10 @@ def assemble_mufftin_d(ordered_atomic_numbers, output_filename='mufftin.d'):
             if os.path.exists(filename):
                 atelem_files.append(filename)
             else:
-                print(f"AVISO: Arquivo de potencial '{filename}' não encontrado. Ele será pulado.")
+                print(f"AVISO: Arquivo '{filename}' não encontrado.")
 
         if not atelem_files:
-            print("Nenhum arquivo atelem.* correspondente foi encontrado. O arquivo mufftin.d não será criado.")
+            print("Nenhum arquivo atelem.* encontrado. O arquivo não será criado.")
             return
 
         first_file = atelem_files.pop(0)
@@ -170,9 +162,9 @@ def assemble_mufftin_d(ordered_atomic_numbers, output_filename='mufftin.d'):
     except Exception as e:
         print(f"ERRO ao montar o arquivo {output_filename}: {e}")
 
-
-def generate_mscd_phaseshift_input(all_params, output_filename='mscd_phaseshift.inp'):
-    """Gera o arquivo de input para o MSCD com vetores de rede totalmente adaptativos."""
+# --- FUNÇÃO MODIFICADA ---
+def generate_mscd_phaseshift_input(all_params, ordered_elements, output_filename='cluster.i'):
+    """Gera o arquivo de input para o MSCD, respeitando a ordem dos elementos."""
     print(f"\nGerando arquivo de input para o MSCD: {output_filename}")
 
     first_layer = all_params[0]
@@ -209,7 +201,7 @@ def generate_mscd_phaseshift_input(all_params, output_filename='mscd_phaseshift.
         origin_ang_rad = np.radians(params['origin_ang_deg'])
         origin_x = params['origin_len'] * np.cos(origin_ang_rad)
         origin_y = params['origin_len'] * np.sin(origin_ang_rad)
-        accumulated_z -= params.get('interlayer_spacing', 0.0) # Usar .get para segurança
+        accumulated_z -= params.get('interlayer_spacing', 0.0)
         
         basis_atom = np.array([
             origin_x / lattice_constant_A,
@@ -224,43 +216,42 @@ def generate_mscd_phaseshift_input(all_params, output_filename='mscd_phaseshift.
         f.write(f"  {vec_a[0]:<8.4f}{vec_a[1]:<8.4f}{vec_a[2]:<8.4f}\n")
         f.write(f"  {vec_b[0]:<8.4f}{vec_b[1]:<8.4f}{vec_b[2]:<8.4f}\n")
         f.write(f"  {vec_c[0]:<8.4f}{vec_c[1]:<8.4f}{vec_c[2]:<8.4f}\n")
-        f.write(f"   {len(atom_types)}\n")
-        for z_number, basis_atoms in sorted(atom_types.items()):
+        
+        # CORREÇÃO: Conta apenas os elementos que estão de fato nas camadas
+        elements_in_layers = [z for z in ordered_elements if z in atom_types]
+        f.write(f"   {len(elements_in_layers)}\n")
+
+        # CORREÇÃO: Itera na ordem correta, vinda do cabeçalho
+        for z_number in elements_in_layers:
+            basis_atoms = atom_types[z_number]
             symbol = atomic_symbols.get(z_number, 'X')
             f.write(f"{symbol}\n")
             
-            # --- CORREÇÃO DE FORMATAÇÃO PARA FORTRAN ---
-            num_layers = len(basis_atoms)
-            if num_layers < 10:
-                # Formato que funciona para 1-9 layers (3 espaços antes, 2 depois)
-                f.write(f"   {num_layers}  {float(z_number):<8.4f} 0.0000 2.6292\n")
+            # Lógica de formatação para 1 ou 2 dígitos
+            num_basis_atoms = len(basis_atoms)
+            if num_basis_atoms < 10:
+                f.write(f"   {num_basis_atoms:<2d}{float(z_number):<8.4f} 0.0000 1.0000\n")
             else:
-                # Formato ajustado para 10+ layers (2 espaços antes, 2 depois)
-                f.write(f"  {num_layers}  {float(z_number):<8.4f} 0.0000 2.6292\n")
+                f.write(f"  {num_basis_atoms:<3d}{float(z_number):<8.4f} 0.0000 1.0000\n")
 
             for atom_coord in basis_atoms:
                 f.write(f"  {atom_coord[0]:<8.4f}{atom_coord[1]:<8.4f}{atom_coord[2]:<8.4f}\n")
         f.write("   3\n")
         f.write("  0.6667\n")
         f.write("  10\n")
-    print("Arquivo de input do MSCD gerado com sucesso.")
+    print(f"Arquivo '{output_filename}' gerado com sucesso.")
 
-
-# --- Bloco Principal MODIFICADO ---
+# --- Bloco Principal ---
 if __name__ == "__main__":
     input_file = 'input_cluster.txt'
     
-    # 1. Lê o parâmetro de rede do cabeçalho primeiro
     lattice_multiplier = get_lattice_constant_from_header(input_file)
-    
-    # 2. Passa o multiplicador para a função que lê as camadas
     parametros = parse_multi_layer_file(input_file, lattice_constant=lattice_multiplier)
-    
-    # 3. O resto continua como antes
     element_order = get_element_order_from_header(input_file)
 
     if parametros and element_order:
-        generate_mscd_phaseshift_input(parametros, output_filename='cluster.i')
+        # Passa a ordem dos elementos para a função que gera o cluster.i
+        generate_mscd_phaseshift_input(parametros, element_order, output_filename='cluster.i')
         assemble_mufftin_d(element_order, output_filename='atomic.i')
 
 

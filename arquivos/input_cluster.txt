@@ -1,5 +1,5 @@
 1 47 3d 368 Agclean.txt saida.out  1 
-2     
+2 8  1s 531     
 3   
 4   
 
@@ -30,7 +30,7 @@ origin(len,ang) (in Angstrons)
 interlayer spacing (A)
 0
 ///
-47 1  (1 ou 0, emitindo ou não emitindo) 2 B
+8 0  (1 ou 0, emitindo ou não emitindo) 2 B
 unita(len ang)
 0.7070500     30.000000
 unitb(len ang)

@@ -10,6 +10,7 @@ Copyright (c) Van Hove Group 1997. All rights reserved
 un      "Yosef (UFJ-PPGCAS)"    user name
 sn      Ga2O3(100)              system name
 ps01    ps1.1.txt               input phase shift data file
+ps02    ps2.1.txt               input phase shift data file
 
 rm01    rm1.txt               input radial matrix data file
 ex      Agclean.txt          experimental data
@@ -40,7 +41,7 @@ pe      saida.out            output photoemission data file
  0						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 
-2	1	1	0			layer, kind, emitter, lineatom
+2	2	0	0			layer, kind, emitter, lineatom
 0	0	0	0			latoms(xa,xb,ya,yb)
  0.7070500     30.000000			unita(len ang) (fcc (111) structure)
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
