@@ -9,4 +9,4 @@ Copyright (c) Van Hove Group 1997-1998. All rights reserved
  Job report
 
    1   output_header.txt
-       result saved in file saida.out
+Error 201, radial matrix file not found, program terminated

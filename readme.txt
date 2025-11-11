@@ -1,20 +1,16 @@
-Olá!
-Para essa automação funcionar, uma série de critérios precisa atingido:
+Hello!
+For this automation to work, a series of criteria must be met:
 
+First: poconv, psrmin, psh0 and psh1 must be compiled and working inside the 'arquivos' folder
 
-Primeiro: O poconv, psrmin,psh0 e psh1 precisam estar compilados e funcionando dentro da pasta arquivos
+Second: MSCD-ATA also needs to be compiled and working inside the 'arquivos' folder
 
-Segundo: o MSCD-ATA também precisa estar compilado e funcionando dentro da pasta arquivos
+Third: The input file must always be named "input_cluster.txt" as it is the reference for creating cluster.i
 
-Terceiro: o arquivo de input precisa sempre ter o nome "input_cluster.txt" ele é a referência para criar o cluster.i
+Fourth: The file with the experimental data must be inside the "arquivos" folder and be in the MSCD format
 
-Quarto: o arquivo com os dados experimentais precisa estar dentro da pasta "arquivos" e estar no modelo do MSCD
+Fifth: For new.py, which plots the theoretical pattern and calculates the R-factor, just leave the output file name as saida.out.
+Or go into new.py and change the name of the file it will read in the last few lines.
 
-Quinto: para o new.py que plota o padrão teórico e cálcula o R-factor basta deixar o nome do arquivo de saída de saida.out.
-Ou entre dentro do new.py e mude lá nas últimas linhas o nome do arquivo q ele vai ler.
-
-Sexto: Use o lattice como "1.000" no cabeçalho do "input_cluster" dessa forma os Ps e Rm serão cálculados corretamente
-
-Sétimo: Por limitação do programa q cálcula a diferença de fase, o input_cluster.txt só pode ter uma base de vetores, mas nada impede vc de usar essa automação apenas para criar o os ps e rm e depois pegar o arquivo de input para usar nas suas simulações
-
+Sixth: Due to a limitation of the program that calculates the phase shift, input_cluster.txt can only have one vector basis, but nothing stops you from using this automation just to create the ps and rm files and then take the input file to use in your simulations.
 

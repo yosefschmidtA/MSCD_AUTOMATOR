@@ -4,21 +4,25 @@ import re
 import os
 import subprocess
 
-# --- Constantes de Conversão ---
+# --- Conversion Constants ---
 A_TO_BOHR = 1.88973
 
-# Dicionário para converter NÚMERO ATÔMICO para SÍMBOLO
+# Dictionary to convert ATOMIC NUMBER to SYMBOL
 atomic_symbols = {
     1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N', 8: 'O',
     9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg', 13: 'Al', 14: 'Si', 15: 'P',
     16: 'S', 17: 'Cl', 18: 'Ar', 19: 'K', 20: 'Ca', 21: 'Sc', 22: 'Ti',
     23: 'V', 24: 'Cr', 25: 'Mn', 26: 'Fe', 27: 'Co', 28: 'Ni', 29: 'Cu',
-    30: 'Zn', 31: 'Ga', 32: 'Ge', 33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 47: 'Ag',
+    30: 'Zn', 31: 'Ga', 32: 'Ge', 33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr',
+    37: 'Rb', 38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo', 43: 'Tc', 44: 'Ru',
+    45: 'Rh', 46: 'Pd', 47: 'Ag', 48: 'Cd', 49: 'In', 50: 'Sn', 51: 'Sb',
+    52: 'Te', 53: 'I', 54: 'Xe', 55: 'Cs', 56: 'Ba', 57: 'La', 58: 'Ce',
+    59: 'Pr', 60: 'Nd',
+    # Keeping Tungsten which was in your original list
     74: 'W'
 }
-
 def get_lattice_constant_from_header(filename='input_cluster.txt'):
-    """Lê o cabeçalho para encontrar o parâmetro de rede (lattice)."""
+    """Reads the header to find the lattice parameter."""
     print(f"\nProcurando pelo parâmetro de rede (lattice) em: {filename}")
     try:
         with open(filename, 'r') as f:
@@ -38,7 +42,7 @@ def get_lattice_constant_from_header(filename='input_cluster.txt'):
         return 1.0
 
 def parse_multi_layer_file(filename='input_cluster.txt', lattice_constant=1.0):
-    """Lê um arquivo com múltiplas layers, aplicando o fator de rede."""
+    """Reads a file with multiple layers, applying the lattice factor."""
     print(f"Lendo o arquivo de configuração do cluster: {filename}")
     try:
         with open(filename, 'r') as f:
@@ -100,7 +104,7 @@ def parse_multi_layer_file(filename='input_cluster.txt', lattice_constant=1.0):
         return None
 
 def get_element_order_from_header(filename='input_cluster.txt'):
-    """Lê o cabeçalho para obter a ordem dos elementos."""
+    """Reads the header to get the element order."""
     print(f"\nLendo a ordem dos elementos do cabeçalho de: {filename}")
     ordered_atomic_numbers = []
     try:
@@ -124,7 +128,7 @@ def get_element_order_from_header(filename='input_cluster.txt'):
         return []
 
 def assemble_mufftin_d(ordered_atomic_numbers, output_filename='atomic.i'):
-    """Monta o arquivo atomic.i a partir dos arquivos atelem.*."""
+    """Assembles the atomic.i file from the atelem.* files."""
     print(f"\nMontando o arquivo {output_filename} a partir dos arquivos atelem.*...")
     try:
         if not ordered_atomic_numbers:
@@ -162,9 +166,9 @@ def assemble_mufftin_d(ordered_atomic_numbers, output_filename='atomic.i'):
     except Exception as e:
         print(f"ERRO ao montar o arquivo {output_filename}: {e}")
 
-# --- FUNÇÃO MODIFICADA ---
+# --- MODIFIED FUNCTION ---
 def generate_mscd_phaseshift_input(all_params, ordered_elements, output_filename='cluster.i'):
-    """Gera o arquivo de input para o MSCD, respeitando a ordem dos elementos."""
+    """Generates the input file for MSCD, respecting the element order."""
     print(f"\nGerando arquivo de input para o MSCD: {output_filename}")
 
     first_layer = all_params[0]
@@ -189,8 +193,8 @@ def generate_mscd_phaseshift_input(all_params, ordered_elements, output_filename
 
     print("Parâmetros de rede calculados (agora baseados em Angstroms):")
     print(f"  - Parâmetro de rede base (a_lat): {lattice_constant_A:.4f} Å")
-    print(f"  - Vetor A (normalizado): ({vec_a[0]:.4f}, {vec_a[1]:.4f}, {vec_a[2]:.4f})")
-    print(f"  - Vetor B (normalizado): ({vec_b[0]:.4f}, {vec_b[1]:.4f}, {vec_b[2]:.4f})")
+    print(f"  - Vetor A (normalizado): ({vec_a[0]:<8.4f}, {vec_a[1]:<8.4f}, {vec_a[2]:<8.4f})")
+    print(f"  - Vetor B (normalizado): ({vec_b[0]:<8.4f}, {vec_b[1]:<8.4f}, {vec_b[2]:<8.4f})")
 
     atom_types = {}
     accumulated_z = 0.0
@@ -217,17 +221,17 @@ def generate_mscd_phaseshift_input(all_params, ordered_elements, output_filename
         f.write(f"  {vec_b[0]:<8.4f}{vec_b[1]:<8.4f}{vec_b[2]:<8.4f}\n")
         f.write(f"  {vec_c[0]:<8.4f}{vec_c[1]:<8.4f}{vec_c[2]:<8.4f}\n")
         
-        # CORREÇÃO: Conta apenas os elementos que estão de fato nas camadas
+        # FIX: Count only elements that are actually in the layers
         elements_in_layers = [z for z in ordered_elements if z in atom_types]
         f.write(f"   {len(elements_in_layers)}\n")
 
-        # CORREÇÃO: Itera na ordem correta, vinda do cabeçalho
+        # FIX: Iterate in the correct order, from the header
         for z_number in elements_in_layers:
             basis_atoms = atom_types[z_number]
             symbol = atomic_symbols.get(z_number, 'X')
             f.write(f"{symbol}\n")
             
-            # Lógica de formatação para 1 ou 2 dígitos
+            # Formatting logic for 1 or 2 digits
             num_basis_atoms = len(basis_atoms)
             if num_basis_atoms < 10:
                 f.write(f"   {num_basis_atoms:<2d}{float(z_number):<8.4f} 0.0000 1.0000\n")
@@ -241,7 +245,7 @@ def generate_mscd_phaseshift_input(all_params, ordered_elements, output_filename
         f.write("  10\n")
     print(f"Arquivo '{output_filename}' gerado com sucesso.")
 
-# --- Bloco Principal ---
+# --- Main Block ---
 if __name__ == "__main__":
     input_file = 'input_cluster.txt'
     
@@ -250,8 +254,6 @@ if __name__ == "__main__":
     element_order = get_element_order_from_header(input_file)
 
     if parametros and element_order:
-        # Passa a ordem dos elementos para a função que gera o cluster.i
+        # Pass the element order to the function that generates cluster.i
         generate_mscd_phaseshift_input(parametros, element_order, output_filename='cluster.i')
         assemble_mufftin_d(element_order, output_filename='atomic.i')
-
-

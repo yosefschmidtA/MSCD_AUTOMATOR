@@ -1,62 +1,62 @@
-# tradutor_input.py
-# Este script lê um arquivo de entrada e gera um cabeçalho formatado para o MSCD.
+# input_translator.py
+# This script reads an input file and generates a formatted header for MSCD.
 
 atomic_weights = {
-    # Período 1
-    1: 1.008,    # Hidrogênio (H)
-    2: 4.0026,   # Hélio (He)
+    # Period 1
+    1: 1.008,    # Hydrogen (H)
+    2: 4.0026,   # Helium (He)
     
-    # Período 2
-    3: 6.94,     # Lítio (Li)
-    4: 9.0122,   # Berílio (Be)
-    5: 10.81,    # Boro (B)
-    6: 12.011,   # Carbono (C)
-    7: 14.007,   # Nitrogênio (N)
-    8: 15.999,   # Oxigênio (O)
-    9: 18.998,   # Flúor (F)
-    10: 20.180,  # Neônio (Ne)
+    # Period 2
+    3: 6.94,     # Lithium (Li)
+    4: 9.0122,   # Beryllium (Be)
+    5: 10.81,    # Boron (B)
+    6: 12.011,   # Carbon (C)
+    7: 14.007,   # Nitrogen (N)
+    8: 15.999,   # Oxygen (O)
+    9: 18.998,   # Fluorine (F)
+    10: 20.180,  # Neon (Ne)
     
-    # Período 3
-    11: 22.990,  # Sódio (Na)
-    12: 24.305,  # Magnésio (Mg)
-    13: 26.982,  # Alumínio (Al)
-    14: 28.085,  # Silício (Si)
-    15: 30.974,  # Fósforo (P)
-    16: 32.06,   # Enxofre (S)
-    17: 35.45,   # Cloro (Cl)
-    18: 39.948,  # Argônio (Ar)
+    # Period 3
+    11: 22.990,  # Sodium (Na)
+    12: 24.305,  # Magnesium (Mg)
+    13: 26.982,  # Aluminum (Al)
+    14: 28.085,  # Silicon (Si)
+    15: 30.974,  # Phosphorus (P)
+    16: 32.06,   # Sulfur (S)
+    17: 35.45,   # Chlorine (Cl)
+    18: 39.948,  # Argon (Ar)
     
-    # Período 4
-    19: 39.098,  # Potássio (K)
-    20: 40.078,  # Cálcio (Ca)
-    21: 44.956,  # Escândio (Sc)
-    22: 47.867,  # Titânio (Ti)
-    23: 50.942,  # Vanádio (V)
-    24: 51.996,  # Cromo (Cr)
-    25: 54.938,  # Manganês (Mn)
-    26: 55.845,  # Ferro (Fe)
-    27: 58.933,  # Cobalto (Co)
-    28: 58.693,  # Níquel (Ni)
-    29: 63.546,  # Cobre (Cu)
-    30: 65.38,   # Zinco (Zn)
-    31: 69.723,  # Gálio (Ga)
-    32: 72.630,  # Germânio (Ge)
-    33: 74.922,  # Arsênio (As)
-    34: 78.971,  # Selênio (Se)
-    35: 79.904,  # Bromo (Br)
-    36: 83.798,  # Criptônio (Kr)
+    # Period 4
+    19: 39.098,  # Potassium (K)
+    20: 40.078,  # Calcium (Ca)
+    21: 44.956,  # Scandium (Sc)
+    22: 47.867,  # Titanium (Ti)
+    23: 50.942,  # Vanadium (V)
+    24: 51.996,  # Chromium (Cr)
+    25: 54.938,  # Manganese (Mn)
+    26: 55.845,  # Iron (Fe)
+    27: 58.933,  # Cobalt (Co)
+    28: 58.693,  # Nickel (Ni)
+    29: 63.546,  # Copper (Cu)
+    30: 65.38,   # Zinc (Zn)
+    31: 69.723,  # Gallium (Ga)
+    32: 72.630,  # Germanium (Ge)
+    33: 74.922,  # Arsenic (As)
+    34: 78.971,  # Selenium (Se)
+    35: 79.904,  # Bromine (Br)
+    36: 83.798,  # Krypton (Kr)
     
-    # Outros elementos comuns
-    47: 107.868, # Prata (Ag)
-    74: 183.84,  # Tungstênio (W)
-    78: 195.08,  # Platina (Pt)
-    79: 196.97,  # Ouro (Au)
-    80: 200.59,  # Mercúrio (Hg)
+    # Other common elements
+    47: 107.868, # Silver (Ag)
+    74: 183.84,  # Tungsten (W)
+    78: 195.08,  # Platinum (Pt)
+    79: 196.97,  # Gold (Au)
+    80: 200.59,  # Mercury (Hg)
 }
 
 def gerar_cabecalho(input_file, system_name="Ga2O3(100)", user="Yosef (UFJ-PPGCAS)"):
     """
-    Gera um cabeçalho formatado para um arquivo de entrada de simulação.
+    Generates a formatted header for a simulation input file.
     """
     elementos = []
     emissor = None
@@ -69,33 +69,33 @@ def gerar_cabecalho(input_file, system_name="Ga2O3(100)", user="Yosef (UFJ-PPGCA
     except FileNotFoundError:
         return f"ERRO: O ARQUIVO '{input_file}' NAO FOI ENCONTRADO."
 
-    # === Processar as 4 primeiras linhas ===
+    # === Process the first 4 lines ===
     
-    # A. Lê a primeira linha e extrai os arquivos exp e out
+    # A. Reads the first line and extracts the exp and out files
     first_line_parts = lines[0].split()
     if len(first_line_parts) >= 6:
         exp_file = first_line_parts[4]
         out_file = first_line_parts[5]
     
-    # B. Procura por todos os elementos e o emissor
+    # B. Searches for all elements and the emitter
     for i in range(4):
         parts = lines[i].split()
         if not parts:
             continue
             
-        # Adiciona o elemento à lista de elementos
+        # Adds the element to the element list
         if len(parts) >= 2 and parts[1].isdigit():
             z = int(parts[1])
             if z not in elementos:
                 elementos.append(z)
         
-        # Lógica corrigida para encontrar o emissor
+        # Corrected logic to find the emitter
         if len(parts) >= 7 and parts[-1].strip() == "1":
             emissor = int(parts[1])
         elif i > 0 and parts[-1].strip() == "1":
             emissor = int(parts[1])
 
-    # === Construção do cabeçalho ===
+    # === Header construction ===
     header = []
     header.append("    741   10    191     datakind begining-row linenumbers\n")
     header.append("----------------------------------------------------------------\n")
@@ -122,7 +122,7 @@ def gerar_cabecalho(input_file, system_name="Ga2O3(100)", user="Yosef (UFJ-PPGCA
 
     header.append("\n")
 
-    # === Agora copiar SOMENTE até a linha "fit try ..." ===
+    # === Now copy ONLY up to the "fit try ..." line ===
     for line in lines[4:]:
         header.append(line)
         if "fit try for vinner" in line:

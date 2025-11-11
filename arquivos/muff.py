@@ -6,8 +6,8 @@ import shutil
 
 def split_potential_file(input_filename='mufftin.d', output_prefix='mufftin'):
     """
-    Lê o arquivo de potencial gerado 'mufftin.d' e o divide em
-    múltiplos arquivos, um para cada bloco de dados de elemento.
+    Reads the generated potential file 'mufftin.d' and splits it into
+    multiple files, one for each element data block.
     """
     print(f"\n--- Iniciando Etapa 3: Divisão do arquivo {input_filename} ---")
     try:
@@ -17,25 +17,25 @@ def split_potential_file(input_filename='mufftin.d', output_prefix='mufftin'):
         print(f"ERRO: Arquivo de potencial '{input_filename}' não encontrado. Etapa de divisão pulada.")
         return
 
-    # CORREÇÃO: Usa uma expressão regular para o delimitador,
-    # aceitando qualquer número de elementos (ex: NRR= 3, NRR= 4, etc.).
-    # O parêntese cria um grupo de captura, que faz com que re.split mantenha o delimitador.
+    # FIX: Uses a regular expression for the delimiter,
+    # accepting any number of elements (e.g., NRR= 3, NRR= 4, etc.).
+    # The parenthesis creates a capture group, which makes re.split keep the delimiter.
     delimiter_regex = r'(\s*&NL2 NRR=\s*\d+\s*&END)'
     
-    # Divide o conteúdo pelo delimitador, mantendo-o. Remove strings vazias.
+    # Splits the content by the delimiter, keeping it. Removes empty strings.
     parts = [part for part in re.split(delimiter_regex, content) if part.strip()]
 
-    # A lista 'parts' agora deve ter o formato [DELIM1, DADOS1, DELIM2, DADOS2, ...]
-    # O número de elementos é a metade do tamanho da lista.
+    # The 'parts' list should now have the format [DELIM1, DATA1, DELIM2, DATA2, ...]
+    # The number of elements is half the size of the list.
     num_elements = len(parts) // 2
 
     if num_elements == 0:
         print(f"Nenhum bloco de dados completo (delimitador + dados) encontrado em '{input_filename}'.")
-        # Lógica de fallback para caso o arquivo tenha apenas um bloco sem delimitador inicial (caso raro)
+        # Fallback logic for case where the file has only one block without an initial delimiter (rare case)
         if len(parts) == 1:
             print("Encontrado apenas 1 bloco de dados. Criando mufftin1.d...")
             output_filename_single = f"{output_prefix}1.d"
-            # Neste caso, o delimitador não foi encontrado, então não o adicionamos.
+            # In this case, the delimiter was not found, so we don't add it.
             with open(output_filename_single, 'w') as f_out:
                 f_out.write(parts[0])
             print(f"Arquivo '{output_filename_single}' criado com sucesso.")
@@ -45,17 +45,17 @@ def split_potential_file(input_filename='mufftin.d', output_prefix='mufftin'):
     for i in range(num_elements):
         output_filename = f"{output_prefix}{i+1}.d"
         
-        # Pega o delimitador e os dados para o elemento atual
+        # Get the delimiter and data for the current element
         delimiter = parts[i*2]
         data_block = parts[i*2 + 1]
 
-        # Recria o bloco com seu delimitador original
+        # Recreate the block with its original delimiter
         block_content = f"{delimiter.strip()}\n{data_block.lstrip()}"
         with open(output_filename, 'w') as f_out:
             f_out.write(block_content)
         with open(output_filename, 'r') as f:
             lines = f.readlines()
-        if len(lines) > 1:  # garante que o arquivo tem mais de 1 linha
+        if len(lines) > 1:  # ensures the file has more than 1 line
             with open(output_filename, 'w') as f:
                 f.writelines(lines[1:])
             
@@ -65,15 +65,15 @@ def split_potential_file(input_filename='mufftin.d', output_prefix='mufftin'):
 
 def run_poconv_sequence(executable_path='./poconv', input_prefix='mufftin'):
     """
-    Encontra todos os arquivos 'mufftin*.d' e executa o programa poconv
-    para cada um deles, gerando os arquivos 'ps*.txt'.
+    Finds all 'mufftin*.d' files and runs the poconv program
+    for each of them, generating the 'ps*.txt' files.
     """
     print(f"\n--- Iniciando Etapa 4: Execução do {executable_path} ---")
     if not os.access(executable_path, os.X_OK):
         print(f"ERRO: O arquivo '{executable_path}' não é executável ou não foi encontrado.")
         return
 
-    # CORREÇÃO: Padrão de glob mais específico para pegar apenas os arquivos divididos.
+    # FIX: More specific glob pattern to only get the split files.
     muffin_files = sorted(glob.glob(f"{input_prefix}[0-9]*.d"))
     if not muffin_files:
         print(f"Nenhum arquivo '{input_prefix}[0-9]*.d' encontrado para processar. Etapa do poconv pulada.")
@@ -90,7 +90,7 @@ def run_poconv_sequence(executable_path='./poconv', input_prefix='mufftin'):
         print(f"\nProcessando '{input_file}' -> '{output_file}'...")
 
         try:
-            # Executa o processo e mostra a saída em tempo real
+            # Runs the process and shows output in real-time
             process_poconv = subprocess.Popen(
                 [executable_path], stdin=subprocess.PIPE, text=True
             )
@@ -108,8 +108,8 @@ def run_poconv_sequence(executable_path='./poconv', input_prefix='mufftin'):
 
 def parse_element_info(filename='input_cluster.txt'):
     """
-    Lê as linhas de cabeçalho do 'input_cluster.txt' para extrair
-    informações sobre cada elemento (orbital, energia).
+    Reads the header lines of 'input_cluster.txt' to extract
+    information about each element (orbital, energy).
     """
     print(f"\n--- Lendo informações de elementos de {filename} ---")
     element_data = []
@@ -142,7 +142,7 @@ def parse_element_info(filename='input_cluster.txt'):
 
 def generate_psrmin_files(element_info_list):
     """
-    Gera um arquivo psrmin.txt para cada elemento encontrado.
+    Generates a psrmin.txt file for each element found.
     """
     print("\n--- Iniciando Etapa 5: Geração dos arquivos psrmin ---")
     if not element_info_list:
@@ -184,15 +184,15 @@ def generate_psrmin_files(element_info_list):
 
 def run_psrm_sequence(executable_path='./psrm.x'):
     """
-    Executa o psrm.x para cada elemento, primeiro para phase shift (0)
-    e depois para radial matrix (1).
+    Runs psrm.x for each element, first for phase shift (0)
+    and then for radial matrix (1).
     """
     print(f"\n--- Iniciando Etapa 6: Execução do {executable_path} ---")
     if not os.access(executable_path, os.X_OK):
         print(f"ERRO: O arquivo '{executable_path}' não é executável ou não foi encontrado.")
         return
 
-    # CORREÇÃO: Padrão de glob mais específico para evitar pegar 'psrmin.txt'
+    # FIX: More specific glob pattern to avoid matching 'psrmin.txt'
     psrmin_files = sorted(glob.glob("psrmin[0-9]*.txt"))
     if not psrmin_files:
         print("Nenhum arquivo 'psrmin[0-9]*.txt' encontrado para processar. Etapa pulada.")
@@ -203,7 +203,7 @@ def run_psrm_sequence(executable_path='./psrm.x'):
         with open(psrmin_file, 'r') as f:
             original_content = f.read()
 
-        # --- Cálculo do Phase Shift (0) ---
+        # --- Phase Shift Calculation (0) ---
         print("  - Configurando para Phase Shift (0)...")
         content_ps = re.sub(r"^(10\s+)1(\s+lnum.*)$", r"\g<1>0\g<2>", original_content, flags=re.MULTILINE)
         with open('psrmin.txt', 'w') as f:
@@ -213,7 +213,7 @@ def run_psrm_sequence(executable_path='./psrm.x'):
         subprocess.run([executable_path], text=True)
         print("  - Phase Shift calculado.")
 
-        # --- Cálculo da Radial Matrix (1) ---
+        # --- Radial Matrix Calculation (1) ---
         print("  - Configurando para Radial Matrix (1)...")
         content_rm = re.sub(r"^(10\s+)0(\s+lnum.*)$", r"\g<1>1\g<2>", content_ps, flags=re.MULTILINE)
         with open('psrmin.txt', 'w') as f:
@@ -223,21 +223,21 @@ def run_psrm_sequence(executable_path='./psrm.x'):
         subprocess.run([executable_path], text=True)
         print("  - Radial Matrix calculada.")
 
-    # Limpa o arquivo temporário no final
+    # Clean up the temporary file at the end
     try:
         os.remove('psrmin.txt')
         print("\nArquivo temporário 'psrmin.txt' removido.")
     except FileNotFoundError:
-        pass # Não faz nada se o arquivo não existir
+        pass # Do nothing if the file doesn't exist
 
     print("--- Execução do psrm.x concluída. ---")
 
 
 def run_full_sequence(phsh1_exec='./phsh1', poconv_exec='./poconv', psrm_exec='./psrm.x', config_file='input_cluster.txt', potential_file='atomic.i'):
     """
-    Orquestra a execução de toda a sequência de automação.
+    Orchestrates the execution of the entire automation sequence.
     """
-    # ETAPA 1: Cálculo "Bulk" para obter o valor MTZ
+    # STEP 1: "Bulk" Calculation to get the MTZ value
     print("--- Iniciando Etapa 1: Cálculo Bulk (opção 0) ---")
     mtz_value = None
     try:
@@ -269,10 +269,10 @@ def run_full_sequence(phsh1_exec='./phsh1', poconv_exec='./poconv', psrm_exec='.
         print(f"ERRO: Executável '{phsh1_exec}' não encontrado.")
         return
 
-    # ETAPA 2: Cálculo "Slab" com o valor MTZ
+    # STEP 2: "Slab" Calculation with the MTZ value
     print("--- Iniciando Etapa 2: Cálculo Slab (opção 1) ---")
     try:
-        # A saída desta etapa será mostrada em tempo real
+        # The output of this step will be shown in real-time
         process_slab = subprocess.Popen(
             [phsh1_exec], stdin=subprocess.PIPE, text=True
         )
@@ -287,7 +287,7 @@ def run_full_sequence(phsh1_exec='./phsh1', poconv_exec='./poconv', psrm_exec='.
         print(f"ERRO: Executável '{phsh1_exec}' não encontrado.")
         return
 
-    # ETAPAS 3, 4, 5 e 6
+    # STEPS 3, 4, 5 and 6
     split_potential_file(input_filename='mufftin.d')
     run_poconv_sequence(executable_path=poconv_exec)
     element_info = parse_element_info(filename=config_file)
@@ -296,7 +296,6 @@ def run_full_sequence(phsh1_exec='./phsh1', poconv_exec='./poconv', psrm_exec='.
         run_psrm_sequence(executable_path=psrm_exec)
 
 
-# --- Bloco Principal ---
+# --- Main Block ---
 if __name__ == "__main__":
     run_full_sequence()
-
