@@ -31,6 +31,8 @@ cp "$ARQUIVO_DE_ENTRADA" "$PASTA_DE_TRABALHO"/
 cd "$PASTA_DE_TRABALHO"
 echo "DIRECTORY CHANGED TO '$PASTA_DE_TRABALHO'."
 
+
+# --- Bloco Novo (mexe no LD_LIBRARY_PATH E no PATH) ---
 LIB_PATH=$(find / -name "libmpi_cxx.so.1" 2>/dev/null | head -n 1)
 
 # Checks if the library was found
@@ -39,13 +41,17 @@ if [ -z "$LIB_PATH" ]; then
     exit 1
 fi
 
-# Extracts the directory from the full path and exports it
-DIR_PATH=$(dirname "$LIB_PATH")
-export LD_LIBRARY_PATH="$DIR_PATH:$LD_LIBRARY_PATH"
+# Extrai o diretório da biblioteca (ex: /usr/lib64/mpi/gcc/openmpi/lib64)
+LIB_DIR=$(dirname "$LIB_PATH")
+# Deduz o diretório de binários (ex: /usr/lib64/mpi/gcc/openmpi/bin)
+BIN_DIR=$(dirname "$LIB_DIR")/bin
 
-echo "MPI LIBRARY FOUND AT: $DIR_PATH"
-echo "LD_LIBRARY_PATH VARIABLE EXPORTED."
-echo "COMPILING 'randmscd_parallel'..."
+# Exporta AMBOS os caminhos
+export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+export PATH="$BIN_DIR:$PATH"
+
+echo "MPI LIBRARY DIR FOUND AT: $LIB_DIR"
+echo "MPI BIN DIR ADDED TO PATH: $BIN_DIR"
 make randmscd_parallel
 
 # Verifica se o comando 'make' foi bem-sucedido

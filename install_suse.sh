@@ -12,16 +12,15 @@ echo "--- Installing MSCD_AUTOMATOR dependencies (openSUSE) ---"
 echo "Refreshing repositories..."
 sudo zypper refresh
 
-# 2. Install the C/C++ and Fortran development "patterns"
-# This is the equivalent of 'build-essential'
-echo "Installing Development Patterns (devel_basis, devel_C_C++, devel_fortran)..."
-sudo zypper install -t pattern devel_basis devel_C_C++ devel_fortran
+# 2. Install the C/C++ development "patterns"
+echo "Installing C/C++ Development Patterns (devel_basis, devel_C_C++)..."
+sudo zypper install -t pattern -y devel_basis devel_C_C++
 
-# 3. Install MPI, Python/Numpy, and 32-bit libraries
-echo "Installing MPI, Python/Numpy, and 32-bit libraries..."
+# 3. Install Fortran, MPI, Python/Numpy, and 32-bit libraries
+echo "Installing Fortran (gcc-fortran), MPI, Python/Numpy, and 32-bit libraries..."
 # 'glibc-32bit' is the 32-bit C library (our libc6:i386 equivalent)
-# 'openmpi-devel' should provide mpic++ (it might be openmpi2/3/4-devel)
-sudo zypper install -y openmpi-devel python3-numpy glibc-32bit
+# 'gcc-fortran' provides the gfortran compiler
+sudo zypper install -y gcc-fortran openmpi-devel python3-numpy glibc-32bit
 
 echo "--------------------------------------------------"
 echo "✅ Dependency installation complete!"
