@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # --- CONFIGURATION VARIABLES ---
-# Defines the working folder name
 PASTA_DE_TRABALHO="arquivos"
 ARQUIVO_DE_ENTRADA="input_cluster.txt"
 
@@ -31,84 +30,77 @@ cp "$ARQUIVO_DE_ENTRADA" "$PASTA_DE_TRABALHO"/
 cd "$PASTA_DE_TRABALHO"
 echo "DIRECTORY CHANGED TO '$PASTA_DE_TRABALHO'."
 
-
-# --- Bloco Novo (mexe no LD_LIBRARY_PATH E no PATH) ---
+# --- MPI Library Setup ---
 LIB_PATH=$(find / -name "libmpi_cxx.so.1" 2>/dev/null | head -n 1)
-
-# Checks if the library was found
 if [ -z "$LIB_PATH" ]; then
     echo "ERROR: Library 'libmpi_cxx.so.1' not found. Check your MPI installation."
     exit 1
 fi
+DIR_PATH=$(dirname "$LIB_PATH")
+export LD_LIBRARY_PATH="$DIR_PATH:$LD_LIBRARY_PATH"
+echo "MPI LIBRARY FOUND AT: $DIR_PATH"
+echo "LD_LIBRARY_PATH VARIABLE EXPORTED."
 
-# Extrai o diretório da biblioteca (ex: /usr/lib64/mpi/gcc/openmpi/lib64)
-LIB_DIR=$(dirname "$LIB_PATH")
-# Deduz o diretório de binários (ex: /usr/lib64/mpi/gcc/openmpi/bin)
-BIN_DIR=$(dirname "$LIB_DIR")/bin
+# --- START OF COMPILATION BLOCKS ---
 
-# Exporta AMBOS os caminhos
-export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
-export PATH="$BIN_DIR:$PATH"
-
-echo "MPI LIBRARY DIR FOUND AT: $LIB_DIR"
-echo "MPI BIN DIR ADDED TO PATH: $BIN_DIR"
+# 1. Compilar randmscd_parallel (com limpeza manual)
+echo "--- Cleaning and Compiling 'randmscd_parallel' ---"
+# Remove o executável antigo e TODOS os arquivos .o do diretório principal
+rm -f randmscd_parallel *.o
 make randmscd_parallel
-
-# Verifica se o comando 'make' foi bem-sucedido
 if [ $? -ne 0 ]; then
-    echo "ERROR: 'make' command failed. Stopping script."
+    echo "ERROR: 'make randmscd_parallel' command failed. Stopping script."
     exit 1
 fi
 
-echo "COMPILING FORTRAN EXECUTABLES..."
-
-
-# --- Bloco de compilação Fortran ATUALIZADO ---
-echo "COMPILING FORTRAN EXECUTABLES..."
-
-# 1. Compilar phsh0 (sem alteração)
-echo "Compiling phsh0..."
+# 2. Compilar phsh0 (com limpeza manual)
+echo "--- Cleaning and Compiling 'phsh0' ---"
 cd phsh0_src/
+# Remove o executável antigo e TODOS os arquivos .o deste subdiretório
+rm -f phsh0 *.o
 make FC=gfortran
 cp phsh0 ../
 cd ..
+if [ ! -f "phsh0" ]; then
+    echo "ERROR: 'phsh0' compilation failed."
+    exit 1
+fi
 
-# 2. Compilar phsh1 (AGORA USANDO O MAKEFILE CORRETO)
-
-# --- INÍCIO DO NOVO BLOCO 'poconv' (O CORRETO) ---
-echo "COMPILING C++ EXECUTABLE 'poconv'..."
-
-# 1. Entra no diretório fonte do poconv
+# 3. Compilar poconv (com limpeza manual)
+echo "--- Cleaning and Compiling 'poconv' ---"
 cd poconv_src/
-
-# 2. Roda a "fórmula mágica" que descobrimos
-# (Adicionei -Wno-write-strings para limpar aqueles avisos de sintaxe antiga)
+# Limpeza manual dos arquivos antigos
+rm -f poconv *.o
+# Compilação (esta linha é silenciosa se funcionar, mas mostrará erros se falhar)
 mpic++ -Wno-write-strings -o poconv poconv.cpp polation.cpp potentia.cpp userinfo.cpp userutil.cpp
-
-# 3. Copia o executável final para a pasta principal
 cp poconv ../
-
-# 4. Volta para a pasta principal
 cd ..
+if [ ! -f "poconv" ]; then
+    echo "ERROR: 'poconv' compilation failed. Check for missing .h or .cpp files."
+    exit 1
+fi
 
-echo "COMPILATION COMPLETE."
-# 5. Executes the cleanup of old files
-echo "PERFORMING CLEANUP OF OLD FILES..."
-find . -maxdepth 1 \( -name "ps*" -o -name "rm*" \) -not -name "rmconv" -not -name "rmconv.cpp" -not -name "rmconv.o" -not -name "psconv" -not -name "psconv.o" -not -name "psrm.x" -delete
-rm output_header.txt
+echo "--- ALL COMPILATIONS COMPLETE ---"
+
+# 5. Executes the cleanup of old *output* files
+echo "PERFORMING CLEANUP OF OLD OUTPUT FILES..."
+find . -maxdepth 1 \( -name "ps*" -o -name "rm*" \) \
+ -not -name "psconv" -not -name "psconv.cpp" -not -name "psconv.o" \
+ -not -name "psrm.x" -not -name "phsh1" -not -name "poconv" -delete
+rm -f output_header.txt
 rm -f mufftin*.d
 echo "CLEANUP COMPLETE."
 
 # 6. Executes the Python script sequence
 echo "EXECUTING PYTHON SCRIPTS..."
 python3 gerador.py
-sleep 3
+sleep 1
 python3 muff.py
-sleep 3
+sleep 1
 python3 leitoF.py
-sleep 3
+sleep 1
 python3 criador_final.py
-sleep 3
+sleep 1
 
 # 7. Executes the randmscd program
 echo "EXECUTING RANDMSCD PROGRAM..."
