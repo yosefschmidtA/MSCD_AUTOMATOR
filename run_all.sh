@@ -31,7 +31,7 @@ cd "$PASTA_DE_TRABALHO"
 echo "DIRECTORY CHANGED TO '$PASTA_DE_TRABALHO'."
 
 # --- MPI Library Setup ---
-LIB_PATH=$(find / -name "libmpi_cxx.so.1" 2>/dev/null | head -n 1)
+LIB_PATH=$(find . -name "libmpi_cxx.so.1" 2>/dev/null | head -n 1)
 if [ -z "$LIB_PATH" ]; then
     echo "ERROR: Library 'libmpi_cxx.so.1' not found. Check your MPI installation."
     exit 1
