@@ -104,7 +104,7 @@ sleep 1
 
 # 7. Executes the randmscd program
 echo "EXECUTING RANDMSCD PROGRAM..."
-mpirun -np 5 randmscd_parallel output_header.txt
+mpirun -np 2 randmscd_parallel output_header.txt
 
 # 8. Copies the input file back to the main directory
 echo "COPYING '$ARQUIVO_DE_ENTRADA' FILE BACK TO THE MAIN DIRECTORY..."
