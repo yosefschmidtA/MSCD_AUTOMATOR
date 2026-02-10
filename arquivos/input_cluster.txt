@@ -1,7 +1,7 @@
-1 47 3d 368 Agclean.txt saida.out  1 
-2      
-3   
-4   
+1 47 3d 368 Agclean.txt saida.out  1
+2
+3
+4
 
 223     10       0.001          scanmode,dispmode,ftolerance
 2       0       2       2       linitial,lnum,msorder,raorder
@@ -16,7 +16,7 @@
 107.87  0.0     0.0     0.0     effective weight for kind 1-4 (amu)
 0       0.0     0.0             ATA, ATAWeight1, ATAWeight2, t=(1-ATAWeight)*t1+ATAWeight*t2)
 0.0     0.0     0.0   0.0       magnetization amplitude for kind 1-4
-0.1     104.0   300.0   0.005   vinner(eV),tdebye,tsample(K),pathcut
+0.1     504.0   300.0   0.005   vinner(eV),tdebye,tsample(K),pathcut
 0.0     0.0     0.0             fit try for vinner, tdebye and lattice
 
 ///
@@ -120,16 +120,3 @@ origin(len,ang) (in Angstrons)
 interlayer spacing (A)
 0.4600000
 ///
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,0 +1,8 @@
+.git
+arquivos/*.o
+arquivos/poconv
+arquivos/phsh0
+arquivos/randmscd_parallel
+pacotes_offline
+*.tar.gz
+*.tar
