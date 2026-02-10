@@ -102,50 +102,59 @@
     </div>
 
     <div class="footer">Desenvolvido para cálculos de XPD teórico - 2026</div>
+<script>
+    document.getElementById('simulationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const content = document.getElementById('inputCluster').value;
+        const statusDiv = document.getElementById('status');
+        const btn = document.getElementById('btnRun');
 
-    <script>
-        document.getElementById('simulationForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Não deixa a página recarregar
+        if(!content.trim()) {
+            alert("O campo de input está vazio!");
+            return;
+        }
+
+        // Interface em modo "Processando"
+        statusDiv.style.display = 'block';
+        btn.disabled = true;
+        btn.innerText = "Calculando...";
+
+        fetch('/rodar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ 'inputCluster': content })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erro no servidor');
+            return response.blob(); // ESSA É A CHAVE: Trata o retorno como arquivo (binário)
+        })
+        .then(blob => {
+            // Cria uma URL temporária para o arquivo ZIP
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
             
-            const content = document.getElementById('inputCluster').value;
-            const statusDiv = document.getElementById('status');
-            const btn = document.getElementById('btnRun');
-
-            if(!content.trim()) {
-                alert("O campo de input está vazio!");
-                return;
-            }
-
-            // Interface em modo "Carregando"
-            statusDiv.style.display = 'block';
-            btn.disabled = true;
-            btn.innerText = "Calculando...";
-
-            // Envia para o Flask
-            fetch('/rodar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    'inputCluster': content
-                })
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert(data); // "Sucesso!" ou "Erro!" vindo do Python
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert("Houve uma falha na comunicação com o servidor.");
-            })
-            .finally(() => {
-                // Volta a interface ao normal
-                statusDiv.style.display = 'none';
-                btn.disabled = false;
-                btn.innerText = "Gerar Arquivos (ps1, ps2, rm1)";
-            });
+            // Define o nome do arquivo que o usuário verá
+            a.download = 'resultados_mscd.zip'; 
+            
+            document.body.appendChild(a);
+            a.click(); // Simula o clique para baixar
+            
+            window.URL.revokeObjectURL(url); // Limpa a memória
+            alert("Download concluído! Verifique sua pasta de Downloads.");
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert("Houve uma falha ao gerar os arquivos. Verifique o terminal do Flask.");
+        })
+        .finally(() => {
+            statusDiv.style.display = 'none';
+            btn.disabled = false;
+            btn.innerText = "Gerar Arquivos (ps1, ps2, rm1)";
         });
-    </script>
+    });
+</script>
 </body>
 </html>

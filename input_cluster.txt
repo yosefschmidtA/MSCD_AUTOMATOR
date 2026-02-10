@@ -119,4 +119,3 @@ origin(len,ang) (in Angstrons)
 0      0.000000
 interlayer spacing (A)
 0.4600000
-///
