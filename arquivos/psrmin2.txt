@@ -1,0 +1,20 @@
+     821    11    20      datakind beginning-row linenumbers
+
+  ----------------------------------------------------------------
+                         David A. Shirley's group
+                   Pennsylvania State University (PSU)
+               Lawrence Berkeley National Laboratory (LBNL)
+     Copyright (c) 1995-1996 DAS group. All rights reserved
+  ----------------------------------------------------------------
+
+         input file for phase shift or radial matrix calculation 
+'po'    'ps2.txt'         input potential data filein
+'ps'    'ps2.1.txt'      output phase shift data file
+'rm'    'rm2.txt'      output radial matrix data file
+'ss'    '1s'               subshell and initial state
+'sb'    '1'             symbol of atom
+'at'    '1'             name of atom
+
+10         1    lnum, output file (0=phase shfit, 1= radial matrix)
+5.0         20.00   0.05    kin, kmax, kstep
+531                     subshell binding energy

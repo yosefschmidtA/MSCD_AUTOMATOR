@@ -1,160 +1,163 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MSCD Web Automator - XPD Solver</title>
+    <title>MSCD Web Automator</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            margin: 0;
-            padding: 20px;
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --accent: #3498db;
+            --bg: #f0f2f5;
+            --sidebar-bg: #ffffff;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        
+        /* Two-Column Layout */
+        .main-wrapper {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: flex-start;
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 800px;
+
+        .content-main { flex: 3; }
+
+        .sidebar { 
+            flex: 1; 
+            background: var(--sidebar-bg); 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--accent);
         }
-        h1 { color: #2c3e50; margin-bottom: 5px; }
-        .subtitle { color: #7f8c8d; font-size: 0.9em; margin-bottom: 20px; }
+
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
         
-        /* Estilo Editor de Código */
-        textarea {
-            width: 100%;
-            height: 350px;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #1e1e1e; /* Dark mode para o input */
-            color: #d4d4d4;
-            resize: vertical;
-            box-sizing: border-box;
-            font-size: 14px;
-            line-height: 1.5;
+        h1 { color: var(--primary); margin: 0 0 20px 0; font-size: 24px; }
+        h3 { margin-top: 0; color: var(--accent); font-size: 18px; }
+
+        textarea { 
+            width: 100%; height: 350px; font-family: 'Consolas', monospace; 
+            background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; border: none; box-sizing: border-box;
+            font-size: 13px; line-height: 1.5;
         }
+
+        .button-group { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
         
-        .button-group {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        #btnRun { 
+            background: var(--success); color: white; border: none; padding: 12px 25px; 
+            font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s;
         }
-        
-        #btnRun {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-weight: bold;
+        #btnRun:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3); }
+
+        /* Results Card */
+        #resultsCard { 
+            margin-top: 20px; background: #e8f5e9; border: 1px solid var(--success); 
+            border-radius: 10px; padding: 20px; display: none;
         }
-        
-        #btnRun:hover { background-color: #219150; }
-        #btnRun:disabled { background-color: #95a5a6; cursor: not-allowed; }
-        
-        #status {
-            padding: 15px;
-            border-radius: 4px;
-            background-color: #e8f4fd;
-            border-left: 5px solid #3498db;
-            color: #2980b9;
-            display: none; /* Escondido por padrão */
-            margin-top: 20px;
-            width: 100%;
-            max-width: 800px;
-            box-sizing: border-box;
+
+        /* Sidebar Style */
+        .example-box p { font-size: 14px; color: #666; line-height: 1.4; }
+        .btn-exemplo {
+            display: block; text-align: center; background: var(--bg); color: var(--primary);
+            text-decoration: none; padding: 10px; border-radius: 6px; border: 1px dashed #ccc;
+            margin-top: 15px; font-weight: bold; transition: 0.2s;
         }
+        .btn-exemplo:hover { background: #e0e0e0; border-color: var(--accent); }
+
+        #status { color: var(--accent); font-weight: bold; display: none; }
         
-        .footer { margin-top: 30px; font-size: 0.8em; color: #bdc3c7; text-align: center; }
+        @media (max-width: 850px) { .main-wrapper { flex-direction: column; } .sidebar { width: 100%; box-sizing: border-box; } }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>MSCD Simulation Input</h1>
-        <div class="subtitle">Insira os dados do <strong>input_cluster.txt</strong> para gerar os arquivos ps1, ps2 e rm1.</div>
-        
-        <form id="simulationForm">
-            <textarea id="inputCluster" name="inputCluster" placeholder="Exemplo:&#10;O 0.000 0.000 0.000&#10;Fe 1.234 0.567 0.890..."></textarea>
-            
-            <div class="button-group">
-                <span id="msgExtra" style="font-size: 0.85em; color: #95a5a6;">Os arquivos serão salvos na pasta local.</span>
-                <button type="submit" id="btnRun">Gerar Arquivos (ps1, ps2, rm1)</button>
-            </div>
-        </form>
+<div class="main-wrapper">
+    <div class="content-main">
+        <div class="container">
+            <h1>MSCD Solver</h1>
+            <p style="margin-top: -15px; margin-bottom: 20px; font-size: 14px; color: #7f8c8d;">XPD Phase Shift & Radial Matrix Generator</p>
+            <form id="simulationForm" action="/rodar" method="POST">
+                <textarea id="inputCluster" name="inputCluster" placeholder="Paste your input_cluster.txt content here..."></textarea>
+                <div class="button-group">
+                    <div id="status">⌛ Processing cluster data...</div>
+                    <button type="submit" id="btnRun">Generate ps & rm</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="resultsCard">
+            <h3 style="color: var(--success); margin-bottom: 10px;">✅ Success!</h3>
+            <p style="margin: 0 0 15px 0; font-size: 14px;">Files generated successfully and ready for download.</p>
+            <a href="#" id="downloadLink" style="background: var(--accent); color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: inline-block;">📥 Download ZIP</a>
+        </div>
     </div>
 
-    <div id="status">
-        <strong>⌛ Processando Simulação...</strong>
-        <p style="margin: 5px 0 0 0; font-size: 0.9em;">Isso pode levar alguns segundos dependendo do tamanho do cluster.</p>
+    <div class="sidebar">
+        <h3>Resources</h3>
+        <div class="example-box">
+            <p>New to the format? Download the official input template:</p>
+            <a href="/download_exemplo" class="btn-exemplo">
+                📄 Download example.txt
+            </a>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="font-size: 12px;"><strong>Pro Tip:</strong> Use only one basis of vectors </p>
+        </div>
     </div>
+</div>
 
-    <div class="footer">Desenvolvido para cálculos de XPD teórico - 2026</div>
 <script>
-    document.getElementById('simulationForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    window.onload = function() {
+        const form = document.getElementById('simulationForm');
         
-        const content = document.getElementById('inputCluster').value;
-        const statusDiv = document.getElementById('status');
-        const btn = document.getElementById('btnRun');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); 
 
-        if(!content.trim()) {
-            alert("O campo de input está vazio!");
-            return;
-        }
+            const content = document.getElementById('inputCluster').value;
+            const status = document.getElementById('status');
+            const btn = document.getElementById('btnRun');
+            const resultsCard = document.getElementById('resultsCard');
+            const downloadLink = document.getElementById('downloadLink');
 
-        // Interface em modo "Processando"
-        statusDiv.style.display = 'block';
-        btn.disabled = true;
-        btn.innerText = "Calculando...";
+            if(!content.trim()) return alert("Input field is empty!");
 
-        fetch('/rodar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ 'inputCluster': content })
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Erro no servidor');
-            return response.blob(); // ESSA É A CHAVE: Trata o retorno como arquivo (binário)
-        })
-        .then(blob => {
-            // Cria uma URL temporária para o arquivo ZIP
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            
-            // Define o nome do arquivo que o usuário verá
-            a.download = 'resultados_mscd.zip'; 
-            
-            document.body.appendChild(a);
-            a.click(); // Simula o clique para baixar
-            
-            window.URL.revokeObjectURL(url); // Limpa a memória
-            alert("Download concluído! Verifique sua pasta de Downloads.");
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert("Houve uma falha ao gerar os arquivos. Verifique o terminal do Flask.");
-        })
-        .finally(() => {
-            statusDiv.style.display = 'none';
-            btn.disabled = false;
-            btn.innerText = "Gerar Arquivos (ps1, ps2, rm1)";
+            resultsCard.style.display = 'none';
+            status.style.display = 'block';
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            fetch('/rodar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 'inputCluster': content })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Server error');
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = 'mscd_results.zip';
+                
+                resultsCard.style.display = 'block';
+                status.style.display = 'none';
+                btn.disabled = false;
+                btn.innerText = "Generate ps & rm";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Processing failed! Check the Python terminal for details.");
+                btn.disabled = false;
+                status.style.display = 'none';
+                btn.innerText = "Generate ps & rm";
+            });
         });
-    });
+    };
 </script>
+
 </body>
 </html>

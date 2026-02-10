@@ -58,7 +58,13 @@ def rodar_simulacao():
 
     except subprocess.CalledProcessError as e:
         return f"Erro durante a execução do script: {e}", 500
-
+@app.route('/download_exemplo')
+def download_exemplo():
+    caminho_exemplo = os.path.join("arquivos", "exemplo.txt")
+    if os.path.exists(caminho_exemplo):
+        return send_file(caminho_exemplo, as_attachment=True)
+    else:
+        return "Arquivo de exemplo não encontrado no servidor.", 404
 if __name__ == '__main__':
     # Roda em localhost. O debug=True ajuda a ver erros no terminal.
     app.run(debug=True, port=5000)
