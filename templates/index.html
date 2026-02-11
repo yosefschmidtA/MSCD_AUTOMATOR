@@ -4,74 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSCD Web Automator</title>
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --success: #27ae60;
-            --accent: #3498db;
-            --bg: #f0f2f5;
-            --sidebar-bg: #ffffff;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
-        
-        /* Two-Column Layout */
-        .main-wrapper {
-            display: flex;
-            gap: 20px;
-            max-width: 1100px;
-            margin: 0 auto;
-            align-items: flex-start;
-        }
-
-        .content-main { flex: 3; }
-
-        .sidebar { 
-            flex: 1; 
-            background: var(--sidebar-bg); 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-top: 4px solid var(--accent);
-        }
-
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
-        
-        h1 { color: var(--primary); margin: 0 0 20px 0; font-size: 24px; }
-        h3 { margin-top: 0; color: var(--accent); font-size: 18px; }
-
-        textarea { 
-            width: 100%; height: 350px; font-family: 'Consolas', monospace; 
-            background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; border: none; box-sizing: border-box;
-            font-size: 13px; line-height: 1.5;
-        }
-
-        .button-group { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
-        
-        #btnRun { 
-            background: var(--success); color: white; border: none; padding: 12px 25px; 
-            font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s;
-        }
-        #btnRun:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3); }
-
-        /* Results Card */
-        #resultsCard { 
-            margin-top: 20px; background: #e8f5e9; border: 1px solid var(--success); 
-            border-radius: 10px; padding: 20px; display: none;
-        }
-
-        /* Sidebar Style */
-        .example-box p { font-size: 14px; color: #666; line-height: 1.4; }
-        .btn-exemplo {
-            display: block; text-align: center; background: var(--bg); color: var(--primary);
-            text-decoration: none; padding: 10px; border-radius: 6px; border: 1px dashed #ccc;
-            margin-top: 15px; font-weight: bold; transition: 0.2s;
-        }
-        .btn-exemplo:hover { background: #e0e0e0; border-color: var(--accent); }
-
-        #status { color: var(--accent); font-weight: bold; display: none; }
-        
-        @media (max-width: 850px) { .main-wrapper { flex-direction: column; } .sidebar { width: 100%; box-sizing: border-box; } }
-    </style>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
 </head>
 <body>
 
@@ -80,11 +16,12 @@
         <div class="container">
             <h1>MSCD Solver</h1>
             <p style="margin-top: -15px; margin-bottom: 20px; font-size: 14px; color: #7f8c8d;">XPD Phase Shift & Radial Matrix Generator</p>
-            <form id="simulationForm" action="/rodar" method="POST">
+            <form id="simulationForm">
                 <textarea id="inputCluster" name="inputCluster" placeholder="Paste your input_cluster.txt content here..."></textarea>
                 <div class="button-group">
                     <div id="status">⌛ Processing cluster data...</div>
                     <button type="submit" id="btnRun">Generate ps & rm</button>
+                    <button type="button" onclick="visualizarEstrutura()" style="background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">👁️ Visualizar 3D</button>
                 </div>
             </form>
         </div>
@@ -97,14 +34,15 @@
     </div>
 
     <div class="sidebar">
+        <h3>3D Visualization</h3>
+        <div id="container-3d" style="height: 400px; width: 100%; background: #fff; border-radius: 8px; border: 1px solid #ddd;"></div>
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        
         <h3>Resources</h3>
         <div class="example-box">
             <p>New to the format? Download the official input template:</p>
-            <a href="/download_exemplo" class="btn-exemplo">
-                📄 Download example.txt
-            </a>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            <p style="font-size: 12px;"><strong>Pro Tip:</strong> Use only one basis of vectors </p>
+            <a href="/download_exemplo" class="btn-exemplo">📄 Download example.txt</a>
         </div>
     </div>
 </div>
@@ -112,10 +50,8 @@
 <script>
     window.onload = function() {
         const form = document.getElementById('simulationForm');
-        
         form.addEventListener('submit', function(e) {
-            e.preventDefault(); 
-
+            e.preventDefault();
             const content = document.getElementById('inputCluster').value;
             const status = document.getElementById('status');
             const btn = document.getElementById('btnRun');
@@ -142,15 +78,13 @@
                 const url = window.URL.createObjectURL(blob);
                 downloadLink.href = url;
                 downloadLink.download = 'mscd_results.zip';
-                
                 resultsCard.style.display = 'block';
                 status.style.display = 'none';
                 btn.disabled = false;
                 btn.innerText = "Generate ps & rm";
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert("Processing failed! Check the Python terminal for details.");
+                alert("Processing failed!");
                 btn.disabled = false;
                 status.style.display = 'none';
                 btn.innerText = "Generate ps & rm";
@@ -158,6 +92,8 @@
         });
     };
 </script>
+
+<script src="{{ url_for('static', filename='js/viewer.js') }}"></script>
 
 </body>
 </html>
