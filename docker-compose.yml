@@ -1,0 +1,8 @@
+services:
+  mscd-solver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mscd-solver:latest
+    volumes:
+      - ./arquivos:/app/arquivos

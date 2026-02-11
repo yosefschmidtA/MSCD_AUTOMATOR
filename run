@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# MSCD AUTOMATOR - Management Script
+
+function usage() {
+    echo "Usage: ./run [option]"
+    echo "Options:"
+    echo "  build   - Build the Docker image"
+    echo "  prod    - Start the project in Production mode (Detached)"
+    echo "  down    - Stop and remove containers"
+    echo "  logs    - View real-time logs"
+    exit 1
+}
+
+OPTION=$1
+
+if [[ -z "$OPTION" ]]; then
+    usage
+fi
+
+if [[ $OPTION == "build" ]]; then
+    echo "Building MSCD Solver"
+    export DOCKER_BUILDKIT=1
+    docker-compose -f docker-compose.yml build
+elif [[ $OPTION == "prod" ]]; then
+    echo "Starting MSCD"
+    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+    echo "Accessible at http://10.0.1.145"
+elif [[ $OPTION == "down" ]]; then
+    echo "Stopping MSCD Solver..."
+    docker-compose down --remove-orphans
+elif [[ $OPTION == "logs" ]]; then
+    docker-compose logs -f mscd-solver
+else
+    usage
+fi

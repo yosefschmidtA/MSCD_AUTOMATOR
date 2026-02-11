@@ -1,0 +1,12 @@
+services:
+  mscd-solver:
+    restart: unless-stopped
+    ports:
+      
+      - "10.0.1.145:80:5000" 
+    networks:
+      - mscd-network
+
+networks:
+  mscd-network:
+    driver: bridge
