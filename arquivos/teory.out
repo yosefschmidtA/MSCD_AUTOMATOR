@@ -784,6 +784,6 @@ fitted parameters ( nfit =  0  nfollow =  0  )
    r-factorb=sum(chic*chic-chie*chie)/sum(chic*chic+chie*chie)
 
 This calculation took   28 processor seconds on    2 Linux Cluster
-     starting on Thu Feb 12 11:55:56 2026
-   and ending on Thu Feb 12 11:56:10 2026
+     starting on Thu Feb 12 12:05:16 2026
+   and ending on Thu Feb 12 12:05:33 2026
 

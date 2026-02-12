@@ -1,4 +1,4 @@
-1 47 3d 368 expt.txt teory.out  1
+1 47 3d 368 experimentalexample.txt teory.out  1
 2  8 1s 531
 3
 4

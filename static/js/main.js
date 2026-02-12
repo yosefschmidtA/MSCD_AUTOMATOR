@@ -105,5 +105,5 @@ function iniciarLeituraDoLog() {
             }
         })
         .catch(err => console.error("Erro ao ler log:", err));
-    }, 1000); // Lê a cada 1 segundo (1000ms)
+    }, 100); // Lê a cada 1 segundo (1000ms)
 }

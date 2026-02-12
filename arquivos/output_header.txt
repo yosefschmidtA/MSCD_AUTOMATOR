@@ -13,7 +13,7 @@ ps01    ps1.1.txt               input phase shift data file
 ps02    ps2.1.txt               input phase shift data file
 
 rm01    rm1.txt               input radial matrix data file
-ex      expt.txt             experimental data
+ex      experimentalexample.txt experimental data
 pe      teory.out            output photoemission data file
 
 
