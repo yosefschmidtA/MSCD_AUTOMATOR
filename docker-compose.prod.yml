@@ -3,7 +3,7 @@ services:
     restart: unless-stopped
     ports:
       
-      - "10.0.1.145:80:5000" 
+      - "10.0.1.145:60010:5000" 
     networks:
       - mscd-network
 

@@ -13,13 +13,11 @@ ps01    ps1.1.txt               input phase shift data file
 ps02    ps2.1.txt               input phase shift data file
 
 rm01    rm1.txt               input radial matrix data file
-ex      Agclean.txt          experimental data
-pe      saida.out            output photoemission data file
-
+ex      -                    experimental data
+pe      -                    output photoemission data file
 
 
 9       25      4.086           radius,depth,lattice(angs)
-
 
 ///
 47 1  (1 ou 0, emmiter or not) 1 A
@@ -32,92 +30,4 @@ origin(len,ang) (in Angstrons)
 interlayer spacing (A)
 0
 ///
-8 0  (1 ou 0, emmiter or not) 2 B
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      0.000000
-interlayer spacing (A)
-0.6500000
-///
-47 1  (1 ou 0, emmiter or not) 3 C
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      180.000000
-interlayer spacing (A)
-0.7500000
-///
-47 1  (1 ou 0, emmiter or not) 4 A
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0      0.000000
-interlayer spacing (A)
-0.5200000
-///
-47 1  (1 ou 0, emmiter or not) 5 B
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      0.000000
-interlayer spacing (A)
-0.7200000
-///
-47 1  (1 ou 0, emmiter or not)  6 C
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      180.000000
-interlayer spacing (A)
-0.5700000
-///
-47 1  (1 ou 0, emmiter or not)  7 A
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0      0.000000
-interlayer spacing (A)
-0.690000
-///
-47 1  (1 ou 0, emmiter or not)  8 B
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      0.000000
-interlayer spacing (A)
-0.570000
-///
-47 1  (1 ou 0, emmiter or not) 9 C
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      180.000000
-interlayer spacing (A)
-0.5000000
-///
-47 1  (1 ou 0, emmiter or not) 10 A
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0      0.000000
-interlayer spacing (A)
-0.4600000
+
