@@ -14,12 +14,12 @@ ps02    ps2.1.txt               input phase shift data file
 
 rm01    rm1.txt               input radial matrix data file
 ex      experimentalexample.txt experimental data
-pe      teory2.out           output photoemission data file
+pe      teory.out            output photoemission data file
 
 
 223     10       0.001          scanmode,dispmode,ftolerance
-2       0       2       2       linitial,lnum,msorder,raorder
-2      0       3       0       layers,finals,fitmath,trymax
+2       0       1       1       linitial,lnum,msorder,raorder
+10      0       3       0       layers,finals,fitmath,trymax
 17.4    17.4    0.0             kmin,kmax,kstep (per angstrom)
 9       78      3.0             dthetamin,dthetamax,dthetastep (degree)
 111.0   231.0   3.0             dphimin,dphimax,dphistep (degree)
@@ -47,5 +47,69 @@ pe      teory2.out           output photoemission data file
  0.7070500     90.000000			unitb(len ang) (in unit of lattice)
  0.4082232      0.000000			origin(len,ang) (in unit of lattice)
  0.6500000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+3	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0.4082232      180.000000			origin(len,ang) (in unit of lattice)
+ 0.7500000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+4	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 0.5200000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+5	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0.4082232      0.000000			origin(len,ang) (in unit of lattice)
+ 0.7200000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+6	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0.4082232      180.000000			origin(len,ang) (in unit of lattice)
+ 0.5700000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+7	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 0.690000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+8	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0.4082232      0.000000			origin(len,ang) (in unit of lattice)
+ 0.570000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+9	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0.4082232      180.000000			origin(len,ang) (in unit of lattice)
+ 0.5000000						interlayer spacing (unit lattice)
+0.0	0.0	0.0				fit try for spacing, length and units
+
+10	1	1	0			layer, kind, emitter, lineatom
+0	0	0	0			latoms(xa,xb,ya,yb)
+ 0.7070500     30.000000			unita(len ang) (fcc (111) structure)
+ 0.7070500     90.000000			unitb(len ang) (in unit of lattice)
+ 0      0.000000			origin(len,ang) (in unit of lattice)
+ 0.4600000						interlayer spacing (unit lattice)
 0.0	0.0	0.0				fit try for spacing, length and units
 

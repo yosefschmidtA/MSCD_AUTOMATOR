@@ -1,6 +1,8 @@
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 
@@ -240,7 +242,7 @@ def plot_polar_interpolated(df, resolution=500, line_position=0.5, my_variable=N
     if save_path:
         plt.savefig(save_path, dpi=200, bbox_inches='tight')
 
-    plt.pause(600)
+    #plt.pause(600)
 
 
 # Caminho do arquivo
@@ -252,6 +254,4 @@ if __name__ == "__main__":
 
         my_variable = "{:.3f}".format(r_factor_total) if r_factor_total is not None else "N/A"
 
-        plot_polar_interpolated(df, resolution=500, line_position=0.5, my_variable=my_variable, save_path=save_path)
-    else:
-        print("Por favor, forneça o caminho do arquivo como argumento.")
+

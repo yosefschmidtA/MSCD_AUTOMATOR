@@ -107,3 +107,38 @@ function iniciarLeituraDoLog() {
         .catch(err => console.error("Erro ao ler log:", err));
     }, 100); // Lê a cada 1 segundo (1000ms)
 }
+
+function plotarGrafico() {
+    const status = document.getElementById('status');
+    const plotArea = document.getElementById('plot-area');
+    const plotImg = document.getElementById('plot-img');
+
+    // Mostra que está carregando (reaproveitando a div de status ou criando um alerta)
+    if(status) {
+        status.style.display = 'block';
+        status.innerText = "🎨 Gerando gráfico...";
+    }
+
+    // Esconde a área antiga enquanto carrega a nova
+    if(plotArea) plotArea.style.display = 'none';
+
+    fetch('/gerar_grafico', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        if(status) status.style.display = 'none';
+
+        if (data.status === 'success') {
+            if(plotImg && plotArea) {
+                // O timestamp (?t=...) força o navegador a baixar a imagem nova
+                plotImg.src = data.url;
+                plotArea.style.display = 'block';
+            }
+        } else {
+            alert("Erro ao plotar: " + data.message);
+        }
+    })
+    .catch(err => {
+        if(status) status.style.display = 'none';
+        alert("Erro de comunicação ao tentar plotar: " + err);
+    });
+}

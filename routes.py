@@ -79,3 +79,18 @@ def rodar_simulacao():
 def download_exemplo():
     mem_file = file_service.gerar_zip_exemplos()
     return send_file(mem_file, mimetype='application/zip', as_attachment=True, download_name='exemplos_mscd.zip')
+
+@bp.route('/gerar_grafico', methods=['POST'])
+def gerar_grafico_rota():
+    # Chama o serviço que roda o teo.py
+    sucesso, msg = simulation_service.gerar_grafico()
+
+    if sucesso:
+        import time
+        # Retorna o caminho da imagem com timestamp para não usar cache velho
+        return jsonify({
+            "status": "success",
+            "url": f"/static/plot_resultado.png?t={int(time.time())}"
+        })
+    else:
+        return jsonify({"status": "error", "message": msg}), 500

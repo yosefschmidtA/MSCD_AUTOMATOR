@@ -1,11 +1,11 @@
-1 47 3d 368 experimentalexample.txt teory2.out  1
+1 47 3d 368 experimentalexample.txt teory.out  1
 2  8 1s 531
 3
 4
 
 223     10       0.001          scanmode,dispmode,ftolerance
-2       0       2       2       linitial,lnum,msorder,raorder
-2      0       3       0       layers,finals,fitmath,trymax
+2       0       1       1       linitial,lnum,msorder,raorder
+10      0       3       0       layers,finals,fitmath,trymax
 17.4    17.4    0.0             kmin,kmax,kstep (per angstrom)
 9       78      3.0             dthetamin,dthetamax,dthetastep (degree)
 111.0   231.0   3.0             dphimin,dphimax,dphistep (degree)
@@ -40,5 +40,82 @@ origin(len,ang) (in Angstrons)
 interlayer spacing (A)
 0.6500000
 ///
-
-
+47 1  (1 ou 0, emmiter or not) 3 C
+unita(len ang)
+0.7070500     30.000000
+unitb(len ang)
+0.7070500     90.000000
+origin(len,ang) (in Angstrons)
+0.4082232      180.000000
+interlayer spacing (A)
+0.7500000
+///
+47 1  (1 ou 0, emmiter or not) 4 A
+unita(len ang)
+0.7070500     30.000000
+unitb(len ang)
+0.7070500     90.000000
+origin(len,ang) (in Angstrons)
+0      0.000000
+interlayer spacing (A)
+0.5200000
+///
+47 1  (1 ou 0, emmiter or not) 5 B
+unita(len ang)
+0.7070500     30.000000
+unitb(len ang)
+0.7070500     90.000000
+origin(len,ang) (in Angstrons)
+0.4082232      0.000000
+interlayer spacing (A)
+0.7200000
+///
+47 1  (1 ou 0, emmiter or not)  6 C
+unita(len ang)
+0.7070500     30.000000
+unitb(len ang)
+0.7070500     90.000000
+origin(len,ang) (in Angstrons)
+0.4082232      180.000000
+interlayer spacing (A)
+0.5700000
+///
+47 1  (1 ou 0, emmiter or not)  7 A
+unita(len ang)
+0.7070500     30.000000
+unitb(len ang)
+0.7070500     90.000000
+origin(len,ang) (in Angstrons)
+0      0.000000
+interlayer spacing (A)
+0.690000
+///
+47 1  (1 ou 0, emmiter or not)  8 B
+unita(len ang)
+0.7070500     30.000000
+unitb(len ang)
+0.7070500     90.000000
+origin(len,ang) (in Angstrons)
+0.4082232      0.000000
+interlayer spacing (A)
+0.570000
+///
+47 1  (1 ou 0, emmiter or not) 9 C
+unita(len ang)
+0.7070500     30.000000
+unitb(len ang)
+0.7070500     90.000000
+origin(len,ang) (in Angstrons)
+0.4082232      180.000000
+interlayer spacing (A)
+0.5000000
+///
+47 1  (1 ou 0, emmiter or not) 10 A
+unita(len ang)
+0.7070500     30.000000
+unitb(len ang)
+0.7070500     90.000000
+origin(len,ang) (in Angstrons)
+0      0.000000
+interlayer spacing (A)
+0.4600000
