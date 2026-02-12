@@ -65,45 +65,67 @@ def rodar_half_script():
         return True, "Sucesso"
     except subprocess.CalledProcessError as e:
         return False, str(e)
+
 def gerar_grafico():
-    """Roda o teo.py e move a imagem resultante para static"""
+    """Roda o teo.py e move a imagem resultante para static (Com Debug Reforçado)"""
     try:
-        # 1. Verifica se o teory.out existe (na raiz ou em arquivos)
+        # 1. Localiza o teory.out (Input)
         caminho_teory = "teory.out"
         if not os.path.exists(caminho_teory):
-             caminho_teory = "arquivos/teory.out"
-        
-        if not os.path.exists(caminho_teory):
-            return False, "Arquivo teory.out não encontrado para plotagem."
+             # Tenta na pasta arquivos se não achar na raiz
+             if os.path.exists("arquivos/teory.out"):
+                caminho_teory = "arquivos/teory.out"
+             else:
+                return False, f"Arquivo teory.out não encontrado em: {os.getcwd()}"
 
-        # 2. Roda o script teo.py
-        # Ele vai gerar o arquivo 'grafico_polar3.png' na raiz
+        # 2. Prepara o comando
+        # Importante: cwd=os.getcwd() garante que estamos na raiz /app do container
         cmd = ["python3", "teo.py", caminho_teory]
         
+        # 3. Executa capturando TUDO
         resultado = subprocess.run(
             cmd,
-            capture_output=True,
-            text=True
+            capture_output=True, # Pega o que o print() do python solta
+            text=True,
+            cwd=os.getcwd()
         )
         
+        # Se o script quebrar (Exit Code != 0)
         if resultado.returncode != 0:
-            return False, f"Erro no script teo.py: {resultado.stderr}"
+            return False, f"Crash no teo.py:\nSTDERR: {resultado.stderr}\nSTDOUT: {resultado.stdout}"
 
-        # 3. Move a imagem gerada para a pasta public (static)
-        # O nome original no seu script é 'grafico_polar3.png'
-        nome_original = "grafico_polar3.png"
+        # 4. Procura a imagem gerada (Output)
+        nome_imagem = "grafico_polar3.png"
+        
+        # ONDE ESTÁ O WALLY? 
+        # Vamos procurar a imagem na raiz E na pasta arquivos
+        origem_encontrada = None
+        
+        if os.path.exists(nome_imagem):
+            origem_encontrada = nome_imagem
+        elif os.path.exists(os.path.join("arquivos", nome_imagem)):
+            origem_encontrada = os.path.join("arquivos", nome_imagem)
+            
+        # 5. Move para a pasta Static (Pública)
         destino_final = "static/plot_resultado.png"
 
-        if os.path.exists(nome_original):
+        if origem_encontrada:
             # Garante que a pasta static existe
             if not os.path.exists("static"):
                 os.makedirs("static")
                 
-            # Move e renomeia
-            shutil.move(nome_original, destino_final)
+            # Move (substituindo se já existir)
+            shutil.move(origem_encontrada, destino_final)
+            
             return True, "Gráfico gerado com sucesso!"
         else:
-            return False, f"O script rodou, mas não gerou o arquivo '{nome_original}'."
+            # AQUI ESTÁ O SEGREDO: Retorna o log para sabermos o que aconteceu
+            msg_erro = (
+                f"O script rodou (Exit 0), mas não gerou '{nome_imagem}'.\n"
+                f"--- LOG DO SCRIPT ---\n{resultado.stdout}\n"
+                f"--- ERROS SILENCIOSOS ---\n{resultado.stderr}"
+            )
+            return False, msg_erro
 
     except Exception as e:
-        return False, f"Erro interno: {str(e)}"
+        return False, f"Erro interno no servidor: {str(e)}"

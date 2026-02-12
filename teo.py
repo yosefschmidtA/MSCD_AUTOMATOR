@@ -245,13 +245,23 @@ def plot_polar_interpolated(df, resolution=500, line_position=0.5, my_variable=N
     #plt.pause(600)
 
 
-# Caminho do arquivo
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         file_path = sys.argv[1]
         save_path = 'grafico_polar3.png'
+        
+        # Processa o arquivo
         df, r_factor_total = process_file(file_path)
 
+        # Formata a variável
         my_variable = "{:.3f}".format(r_factor_total) if r_factor_total is not None else "N/A"
 
+        # --- ESTA LINHA É CRUCIAL (Verifique se ela existe e não está comentada) ---
+        plot_polar_interpolated(df, resolution=500, line_position=0.5, my_variable=my_variable, save_path=save_path)
+        
+        # Confirmação visual para o log
+        print(f"Sucesso! Gráfico salvo em: {save_path}")
+        
+    else:
+        print("Por favor, forneça o caminho do arquivo como argumento.")
 

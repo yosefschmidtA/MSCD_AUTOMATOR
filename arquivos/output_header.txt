@@ -18,7 +18,7 @@ pe      teory.out            output photoemission data file
 
 
 223     10       0.001          scanmode,dispmode,ftolerance
-2       0       1       1       linitial,lnum,msorder,raorder
+2       0       2       2       linitial,lnum,msorder,raorder
 10      0       3       0       layers,finals,fitmath,trymax
 17.4    17.4    0.0             kmin,kmax,kstep (per angstrom)
 9       78      3.0             dthetamin,dthetamax,dthetastep (degree)
