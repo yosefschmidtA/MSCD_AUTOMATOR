@@ -60,11 +60,30 @@ def rodar_simulacao():
         return f"Erro durante a execução do script: {e}", 500
 @app.route('/download_exemplo')
 def download_exemplo():
-    caminho_exemplo = os.path.join("arquivos", "exemplo.txt")
-    if os.path.exists(caminho_exemplo):
-        return send_file(caminho_exemplo, as_attachment=True)
-    else:
-        return "Arquivo de exemplo não encontrado no servidor.", 404
+    # Cria um arquivo ZIP na memória (RAM)
+    memory_file = io.BytesIO()
+
+    # Abre o ZIP para escrita
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        # Adiciona o exemplo.txt
+        caminho_1 = os.path.join("arquivos", "inputexample.txt")
+        if os.path.exists(caminho_1):
+            zf.write(caminho_1, arcname="inputexample.txt")
+
+        # Adiciona o experimentalexample.txt
+        caminho_2 = os.path.join("arquivos", "experimentalexample.txt")
+        if os.path.exists(caminho_2):
+            zf.write(caminho_2, arcname="experimentalexample.txt")
+
+    # Volta o ponteiro para o início do arquivo na memória
+    memory_file.seek(0)
+
+    return send_file(
+        memory_file,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name='exemplos_mscd.zip'
+    )
 if __name__ == '__main__':
     # Roda em localhost. O debug=True ajuda a ver erros no terminal.
     app.run(debug=True, port=5000)
