@@ -1,11 +1,23 @@
-1 47 3d 368 Agclean.txt saida.out  1
+1 47 3d 368 experimentalexample.txt teory.out  1
 2  8 1s 531
 3
 4
 
-
+223     10       0.001          scanmode,dispmode,ftolerance
+2       0       1       1       linitial,lnum,msorder,raorder
+10      0       3       0       layers,finals,fitmath,trymax
+17.4    17.4    0.0             kmin,kmax,kstep (per angstrom)
+9       78      3.0             dthetamin,dthetamax,dthetastep (degree)
+111.0   231.0   3.0             dphimin,dphimax,dphistep (degree)
+30.0    0.0     1               ltheta, lphi, beampol (degree)
+0.0     0.0     1.5             mtheta, mphi, acceptang (degree)
 9       25      4.086           radius,depth,lattice(angs)
-
+11      0.0     10.5    107.87  valence,bandgap(eV),density(g/cm3),mweight
+107.87  0.0     0.0     0.0     effective weight for kind 1-4 (amu)
+0       0.0     0.0             ATA, ATAWeight1, ATAWeight2, t=(1-ATAWeight)*t1+ATAWeight*t2)
+0.0     0.0     0.0   0.0       magnetization amplitude for kind 1-4
+0.1     504.0   300.0   0.005   vinner(eV),tdebye,tsample(K),pathcut
+0.0     0.0     0.0             fit try for vinner, tdebye and lattice
 
 ///
 47 1  (1 ou 0, emmiter or not) 1 A
@@ -107,3 +119,4 @@ origin(len,ang) (in Angstrons)
 0      0.000000
 interlayer spacing (A)
 0.4600000
+

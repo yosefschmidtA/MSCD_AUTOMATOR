@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSCD Web Automator</title>
-    
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
     <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
 </head>
 <body>
@@ -16,13 +15,25 @@
         <div class="container">
             <h1>MSCD Solver</h1>
             <p style="margin-top: -15px; margin-bottom: 20px; font-size: 14px; color: #7f8c8d;">XPD Phase Shift & Radial Matrix Generator</p>
+            
             <form id="simulationForm">
                 <textarea id="inputCluster" name="inputCluster" placeholder="Paste your input_cluster.txt content here..."></textarea>
+                
                 <div class="button-group">
-                    <div id="status">⌛ Processing cluster data...</div>
-                    <button type="submit" id="btnRun">Generate ps & rm</button>
-                    <button type="button" onclick="visualizarEstrutura()" style="background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">Visualize</button>
+                    <button type="button" id="btnRun" onclick="executarSimulacao('/rodar')" style="background: var(--success); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                        Generate ps & rm
+                    </button>
+
+                    <button type="button" id="btnRunFull" onclick="executarSimulacao('/rodar_full')" style="background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                        🚀 Run Full
+                    </button>
+
+                    <button type="button" onclick="visualizarEstrutura()" style="background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                        👁️ 3D
+                    </button>
                 </div>
+                
+                <div id="status" style="margin-top: 15px; display: none; color: var(--accent); font-weight: bold; text-align: center;">⌛ Processing...</div>
             </form>
         </div>
 
@@ -35,62 +46,62 @@
 
     <div class="sidebar">
         <h3>3D Visualization</h3>
-        <div id="container-3d" style="height: 400px; width: 100%; background: #fff; border-radius: 8px; border: 1px solid #ddd;"></div>
-        
+        <div id="container-3d"></div>
+
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-        
+
         <h3>Resources</h3>
         <div class="example-box">
             <p>New to the format? Download the official input template:</p>
-            <a href="/download_exemplo" class="btn-exemplo">📄 Download example.txt</a>
+            
+            <a href="/download_exemplo" class="btn-exemplo">
+                📦 Download Examples (ZIP)
+            </a>
         </div>
     </div>
 </div>
 
 <script>
-    window.onload = function() {
-        const form = document.getElementById('simulationForm');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const content = document.getElementById('inputCluster').value;
-            const status = document.getElementById('status');
-            const btn = document.getElementById('btnRun');
-            const resultsCard = document.getElementById('resultsCard');
-            const downloadLink = document.getElementById('downloadLink');
+    function executarSimulacao(rota) {
+        const content = document.getElementById('inputCluster').value;
+        const status = document.getElementById('status');
+        const resultsCard = document.getElementById('resultsCard');
+        const downloadLink = document.getElementById('downloadLink');
 
-            if(!content.trim()) return alert("Input field is empty!");
+        // Validação
+        if(!content.trim()) return alert("Input field is empty!");
 
-            resultsCard.style.display = 'none';
-            status.style.display = 'block';
-            btn.disabled = true;
-            btn.innerText = "Processing...";
+        // UI Feedback
+        resultsCard.style.display = 'none';
+        status.style.display = 'block';
+        status.innerText = (rota === '/rodar_full') ? "⌛ Running Full Simulation (Please wait)..." : "⌛ Generating ps & rm...";
 
-            fetch('/rodar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ 'inputCluster': content })
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Server error');
-                return response.blob();
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                downloadLink.href = url;
-                downloadLink.download = 'mscd_results.zip';
-                resultsCard.style.display = 'block';
-                status.style.display = 'none';
-                btn.disabled = false;
-                btn.innerText = "Generate ps & rm";
-            })
-            .catch(error => {
-                alert("Processing failed!");
-                btn.disabled = false;
-                status.style.display = 'none';
-                btn.innerText = "Generate ps & rm";
-            });
+        // Envia para o Python
+        fetch(rota, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ 'inputCluster': content })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Server error');
+            return response.blob();
+        })
+        .then(blob => {
+            // Cria o link de download
+            const url = window.URL.createObjectURL(blob);
+            downloadLink.href = url;
+            downloadLink.download = (rota === '/rodar_full') ? 'full_simulation.zip' : 'mscd_results.zip';
+
+            // Sucesso
+            resultsCard.style.display = 'block';
+            status.style.display = 'none';
+        })
+        .catch(error => {
+            console.error(error);
+            alert("Erro na execução! Verifique o terminal.");
+            status.style.display = 'none';
         });
-    };
+    }
 </script>
 
 <script src="{{ url_for('static', filename='js/viewer.js') }}"></script>
