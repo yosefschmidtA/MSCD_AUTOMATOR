@@ -106,6 +106,31 @@ sleep 1
 echo "EXECUTING RANDMSCD PROGRAM..."
 mpirun -np 2 randmscd_parallel output_header.txt
 
+echo "-------------------------------------"
+echo "🔍 PADRONIZANDO ARQUIVO DE SAÍDA (teory.out)..."
+
+# Verifica se o relatório mscdout.txt existe
+if [ -f "mscdout.txt" ]; then
+    # 1. Busca a linha "result saved in file"
+    # 2. O awk '{print $NF}' pega a ÚLTIMA palavra da linha (ex: teory2.out)
+    NOME_SAIDA=$(grep "result saved in file" mscdout.txt | awk '{print $NF}')
+    
+    # Verifica se encontrou um nome e se esse arquivo existe
+    if [ -n "$NOME_SAIDA" ] && [ -f "$NOME_SAIDA" ]; then
+        echo "   -> Output detectado: $NOME_SAIDA"
+        
+        # Copia o arquivo original para o nome padrão teory.out
+        cp "$NOME_SAIDA" teory.out
+        
+        echo "   ✅ Sucesso! '$NOME_SAIDA' duplicado como 'teory.out'."
+    else
+        echo "   ⚠️ Aviso: Arquivo de saída ($NOME_SAIDA) não encontrado ou não identificado."
+    fi
+else
+    echo "   ⚠️ Aviso: Relatório mscdout.txt não encontrado."
+fi
+echo "-------------------------------------"
+
 # 8. Copies the input file back to the main directory
 echo "COPYING '$ARQUIVO_DE_ENTRADA' FILE BACK TO THE MAIN DIRECTORY..."
 cp "$ARQUIVO_DE_ENTRADA" ../
