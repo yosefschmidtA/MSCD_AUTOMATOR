@@ -2,6 +2,23 @@
 
 # MSCD AUTOMATOR - Management Script
 
+# --- DETECÇÃO AUTOMÁTICA DO DOCKER COMPOSE ---
+# 1. Tenta verificar se o novo "docker compose" (V2) existe
+if docker compose version &> /dev/null; then
+    COMPOSE_CMD="docker compose"
+# 2. Se não, tenta o antigo "docker-compose" (V1)
+elif command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+else
+    echo "❌ Erro: Nenhum Docker Compose encontrado."
+    echo "Instale 'docker-compose' ou o plugin 'docker compose'."
+    exit 1
+fi
+
+# Feedback visual para saber qual está usando
+echo "🔧 Usando gerenciador: $COMPOSE_CMD"
+echo "-----------------------------------"
+
 function usage() {
     echo "Usage: ./run [option]"
     echo "Options:"
@@ -21,16 +38,22 @@ fi
 if [[ $OPTION == "build" ]]; then
     echo "Building MSCD Solver"
     export DOCKER_BUILDKIT=1
-    docker-compose -f docker-compose.yml build
+    # Substituímos o comando fixo pela variável $COMPOSE_CMD
+    $COMPOSE_CMD -f docker-compose.yml build
+
 elif [[ $OPTION == "prod" ]]; then
     echo "Starting MSCD"
-    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+    $COMPOSE_CMD -f docker-compose.yml -f docker-compose.prod.yml up -d
     echo "Accessible at http://10.0.1.145"
+
 elif [[ $OPTION == "down" ]]; then
     echo "Stopping MSCD Solver..."
-    docker-compose down --remove-orphans
+    $COMPOSE_CMD down --remove-orphans
+
 elif [[ $OPTION == "logs" ]]; then
-    docker-compose logs -f mscd-solver
+    # Verifica logs do serviço. Se der erro no nome, tente apenas 'logs -f'
+    $COMPOSE_CMD logs -f mscd-solver
+
 else
     usage
 fi
