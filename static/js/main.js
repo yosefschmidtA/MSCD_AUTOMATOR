@@ -28,7 +28,7 @@ function executarSimulacao(rota) {
         document.getElementById('download-area-full').style.display = 'none';
         resultsCard.style.display = 'none';
         status.style.display = 'block';
-        status.innerText = "⚙️ Gerando ps & rm...";
+        status.innerText = "⚙️ Generating the  ps & rm...";
 
         fetch(rota, { method: 'POST', body: formData })
         .then(async response => {
@@ -62,7 +62,7 @@ function executarSimulacao(rota) {
 
         terminalContainer.style.display = 'block';
         downloadArea.style.display = 'none';
-        terminalLog.innerText = "🚀 Iniciando processo...\n";
+        terminalLog.innerText = "🚀 Starting process...\n";
 
         // 1. Dispara o início da simulação
         fetch('/rodar_full', { method: 'POST', body: formData })
@@ -99,7 +99,7 @@ function iniciarLeituraDoLog() {
             terminalLog.scrollTop = terminalLog.scrollHeight;
 
             // Verifica se acabou
-            if (textoLog.includes("--- SIMULACAO CONCLUIDA ---")) {
+            if (textoLog.includes("--- Simulation Complete ---")) {
                 clearInterval(logInterval); // Para de ler
                 document.getElementById('download-area-full').style.display = 'block'; // Mostra botão de baixar
             }
@@ -116,7 +116,7 @@ function plotarGrafico() {
     // Mostra que está carregando (reaproveitando a div de status ou criando um alerta)
     if(status) {
         status.style.display = 'block';
-        status.innerText = "🎨 Gerando gráfico...";
+        status.innerText = "🎨 Ploting pattern...";
     }
 
     // Esconde a área antiga enquanto carrega a nova

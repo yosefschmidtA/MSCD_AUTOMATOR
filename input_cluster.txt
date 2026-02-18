@@ -1,4 +1,4 @@
-1 47 3d 368 experimentalexample.txt teory.out  1
+1 47 3d 368 experim.txt teory_2.out  1
 2  8 1s 531
 3
 4
@@ -119,3 +119,4 @@ origin(len,ang) (in Angstrons)
 0      0.000000
 interlayer spacing (A)
 0.4600000
+

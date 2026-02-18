@@ -21,9 +21,9 @@
             <form id="simulationForm">
                 
                 <div style="margin-bottom: 15px; background: #e8f0fe; padding: 10px; border-radius: 8px; border: 1px dashed #3498db;">
-                    <label for="experimentalFile" style="font-weight: bold; color: #2c3e50; font-size: 13px;">📂 Upload Experimental Data (Opcional):</label>
+                    <label for="experimentalFile" style="font-weight: bold; color: #2c3e50; font-size: 13px;">📂 Upload Experimental Data (if you don't upload, the example file will be used):</label>
                     <input type="file" id="experimentalFile" name="experimentalFile" class="form-control" style="font-size: 13px; margin-top: 5px;">
-                    <small style="color: #666; font-size: 11px;">O arquivo será salvo na raiz para ser usado pelo script.</small>
+		    <small style="color: #666; font-size: 11px;">The file will be save on the root directory to be used in the simulation</small>
                 </div>
 
                 <textarea id="inputCluster" name="inputCluster" placeholder="Paste your input_cluster.txt content here..."></textarea>
@@ -51,13 +51,13 @@
                     <div style="color: #bbb; font-size: 12px; margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 5px;">
                         🖥️ Live Terminal Output
                     </div>
-                    <pre id="terminal-log" style="color: #0f0; font-family: 'Consolas', monospace; font-size: 12px; height: 250px; overflow-y: auto; white-space: pre-wrap; margin: 0;">Aguardando início...</pre>
+                    <pre id="terminal-log" style="color: #0f0; font-family: 'Consolas', monospace; font-size: 12px; height: 250px; overflow-y: auto; white-space: pre-wrap; margin: 0;">Waiting the start...</pre>
                 </div>
 
                 <div id="download-area-full" style="display: none; margin-top: 15px; text-align: center; padding: 15px; background: #e8f5e9; border: 1px solid #27ae60; border-radius: 8px;">
-                    <h3 style="margin: 0 0 10px 0; color: #27ae60;">✅ Simulação Completa!</h3>
+                    <h3 style="margin: 0 0 10px 0; color: #27ae60;">✅ Simulation Complete!</h3>
                     <a href="/baixar_resultado_full" class="btn-success" style="background: #27ae60; color: white; text-decoration: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; display: inline-block;">
-                        📥 Baixar Resultados (ZIP)
+                        📥 Download Results (ZIP)
                     </a>
                 </div>
 

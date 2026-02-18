@@ -25,7 +25,7 @@ def worker_simulacao():
         
         # Marca o fim no log para o JS saber que acabou
         with open(LOG_FILE, "a") as f:
-            f.write("\n--- SIMULACAO CONCLUIDA ---")
+            f.write("\n--- Simulation Complete ---")
             
     except Exception as e:
         with open(LOG_FILE, "a") as f:
