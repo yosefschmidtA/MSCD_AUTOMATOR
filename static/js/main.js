@@ -85,19 +85,30 @@ function executarSimulacao(rota) {
 function iniciarLeituraDoLog() {
     const terminalLog = document.getElementById('terminal-log');
     
-    // Garante que não temos 2 intervalos rodando ao mesmo tempo
+    // Garante que as áreas de resultado estejam escondidas no começo
+    document.getElementById('download-area-full').style.display = 'none';
+    document.getElementById('error-file-not-found').style.display = 'none';
+
     if (logInterval) clearInterval(logInterval);
 
     logInterval = setInterval(() => {
         fetch('/stream_log')
         .then(res => res.text())
         .then(textoLog => {
-            // Atualiza o texto da tela preta
             terminalLog.innerText = textoLog;
-            
-            // Rola para o final (auto-scroll)
             terminalLog.scrollTop = terminalLog.scrollHeight;
 
+            // --- 1. DETECÇÃO DE ERRO ESPECÍFICO (ERROR 201) ---
+            if (textoLog.includes("Error 201") || textoLog.includes("file not found")) {
+                clearInterval(logInterval); // Para de ler o log
+                
+                // Esconde botão de sucesso (caso tenha aparecido)
+                document.getElementById('download-area-full').style.display = 'none';
+                
+                // MOSTRA O AVISO VERMELHO
+                document.getElementById('error-file-not-found').style.display = 'block';
+                return; // Sai da função
+            }
             // Verifica se acabou
             if (textoLog.includes("--- Simulation Complete ---")) {
                 clearInterval(logInterval); // Para de ler

@@ -2,37 +2,74 @@ import subprocess
 import os
 import threading
 import shutil
+import signal
 
 # Configurações Globais
 LOG_FILE = "execution_log.txt"
 simulacao_ativa = False
 
 def worker_simulacao():
-    """Função que roda em segundo plano (Thread)"""
+    """Função que roda em segundo plano (Thread) com Monitoramento em Tempo Real"""
     global simulacao_ativa
     
     # 1. Limpa/Cria o log vazio com cabeçalho
     with open(LOG_FILE, "w") as f:
-        f.write("--- Iniciando Simulação (Aguarde o processamento) ---\n")
+        f.write("--- Initiating Simulation (Waiting for processing) ---\n")
 
-    # 2. Comando Mágico:
-    # "2>&1" pega erros; "| tee -a" mostra no terminal E salva no arquivo
-    comando = f"bash run_all.sh 2>&1 | tee -a {LOG_FILE}"
+    # 2. O Comando (SEM O TEE)
+    # Removemos o '| tee' porque o Python vai ler a saída e escrever no arquivo ele mesmo.
+    # '2>&1' garante que erros também venham para a leitura.
+    comando = "bash run_all.sh 2>&1"
+
+    processo = None
 
     try:
-        # shell=True é necessário para usar o pipe '|'
-        subprocess.run(comando, shell=True, cwd=os.getcwd())
+        # Inicia o processo permitindo leitura em tempo real (Popen)
+        processo = subprocess.Popen(
+            comando, 
+            shell=True, 
+            cwd=os.getcwd(), 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.STDOUT, 
+            text=True, 
+            bufsize=1 # Importante: Buffer linha a linha
+        )
         
-        # Marca o fim no log para o JS saber que acabou
+        erro_detectado = False
+
+        # Abre o arquivo de log para ir gravando o que acontece
         with open(LOG_FILE, "a") as f:
-            f.write("\n--- Simulation Complete ---")
+            # Loop que lê cada linha que o run_all.sh cospe
+            for linha in processo.stdout:
+                f.write(linha)
+                f.flush() # Força gravar no disco pro JS ler rápido
+                
+                # --- O GUARDA DE TRÂNSITO ---
+                if "Error 201" in linha:
+                    f.write("\n\n⛔ DETECTED ERROR 201. KILLING PROCESS IMMEDIATELY.\n")
+                    f.write("--- SIMULATION ABORTED (FILE NOT FOUND) ---\n")
+                    erro_detectado = True
+                    
+                    # Mata o processo do run_all.sh
+                    processo.kill() 
+                    break # Sai do loop
+        
+        # Se saiu do loop, espera limpar o processo
+        if processo:
+            processo.wait()
+
+        # Só escreve "COMPLETE" se NÃO detectou o erro 201
+        if not erro_detectado:
+            with open(LOG_FILE, "a") as f:
+                f.write("\n--- Simulation Complete ---")
             
     except Exception as e:
         with open(LOG_FILE, "a") as f:
-            f.write(f"\nErro Crítico no Python: {str(e)}")
-            f.write("\n--- SIMULACAO CONCLUIDA (COM ERRO) ---")
+            f.write(f"\nCritical Python Error: {str(e)}")
+            f.write("\n--- SIMULATION COMPLETE (WITH ERROR) ---")
     
     finally:
+        # Libera a variável para permitir nova simulação
         simulacao_ativa = False
 
 def iniciar_thread_full():
@@ -53,7 +90,7 @@ def ler_log_atual():
     if os.path.exists(LOG_FILE):
         with open(LOG_FILE, 'r') as f:
             return f.read()
-    return "Inicializando log..."
+    return "Initializing log..."
 
 def check_ativa():
     return simulacao_ativa
