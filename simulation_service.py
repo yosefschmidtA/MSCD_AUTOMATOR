@@ -166,3 +166,35 @@ def gerar_grafico():
 
     except Exception as e:
         return False, f"Erro interno no servidor: {str(e)}"
+def gerar_grafico_experimental(nome_arquivo_dinamico):
+    """Roda o exp.py isolado do Fortran para não interferir na simulação"""
+    try:
+        caminho_exp = os.path.join(os.getcwd(), nome_arquivo_dinamico)
+        
+        if not os.path.exists(caminho_exp):
+            return False, f"Arquivo {nome_arquivo_dinamico} não encontrado para plotar."
+
+        # Roda o exp.py passando o nome temporário
+        cmd = ["python3", "exp.py", caminho_exp]
+        resultado = subprocess.run(cmd, capture_output=True, text=True, cwd=os.getcwd())
+
+        # Se o script falhar
+        if resultado.returncode != 0:
+            return False, f"Crash no exp.py:\n{resultado.stderr}\nSTDOUT: {resultado.stdout}"
+
+        # Procura a imagem gerada
+        nome_imagem = "grafico_exp.png" 
+        destino_final = "static/plot_exp.png"
+
+        if os.path.exists(nome_imagem):
+            if not os.path.exists("static"): 
+                os.makedirs("static")
+            
+            # Move e sobrescreve a imagem antiga em static/
+            shutil.move(nome_imagem, destino_final)
+            return True, "Gráfico experimental gerado com sucesso!"
+        else:
+            return False, f"Script rodou, mas não gerou '{nome_imagem}'. Log: {resultado.stdout}"
+
+    except Exception as e:
+        return False, f"Erro interno: {str(e)}"

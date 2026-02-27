@@ -94,3 +94,36 @@ def gerar_grafico_rota():
         })
     else:
         return jsonify({"status": "error", "message": msg}), 500
+
+@bp.route('/plotar_experimental', methods=['POST'])
+def plotar_experimental():
+    # 1. Verifica se o navegador enviou o arquivo
+    if 'file' not in request.files:
+        return jsonify({"status": "error", "message": "Nenhum arquivo recebido pelo servidor."}), 400
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return jsonify({"status": "error", "message": "Nome do arquivo está vazio."}), 400
+
+    # 2. Salva o arquivo temporariamente com um prefixo para NÃO brigar com o Fortran
+    nome_temporario = "plot_temp_" + file.filename
+    caminho_salvo = os.path.join(os.getcwd(), nome_temporario)
+    file.save(caminho_salvo)
+
+    # 3. Chama o serviço para rodar o exp.py neste arquivo temporário
+    sucesso, msg = simulation_service.gerar_grafico_experimental(nome_temporario)
+    
+    # 4. Limpeza: apaga o arquivo temporário para não sujar o servidor
+    if os.path.exists(caminho_salvo):
+        os.remove(caminho_salvo)
+    
+    # 5. Retorna o resultado para o navegador
+    if sucesso:
+        import time
+        return jsonify({
+            "status": "success", 
+            "url": f"/static/plot_exp.png?t={int(time.time())}"
+        })
+    else:
+        return jsonify({"status": "error", "message": msg}), 500

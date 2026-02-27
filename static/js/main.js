@@ -153,3 +153,49 @@ function plotarGrafico() {
         alert("Erro de comunicação ao tentar plotar: " + err);
     });
 }
+
+// --- FUNÇÃO DE PLOTAGEM EXPERIMENTAL ---
+function plotarExp() {
+    const fileInput = document.getElementById('experimentalFile');
+
+    if (!fileInput || fileInput.files.length === 0) {
+        alert("Por favor, selecione um arquivo experimental primeiro!");
+        return;
+    }
+
+    const btn = document.getElementById('btn-plot-exp');
+    const plotExpArea = document.getElementById('plot-exp-area');
+    const plotExpImg = document.getElementById('plot-exp-img');
+
+    btn.innerText = "⏳ Carregando...";
+    btn.disabled = true;
+
+    // Empacota o arquivo selecionado para enviar ao Python
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    // Envia via POST com o FormData
+    fetch('/plotar_experimental', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.innerText = "📊 Plot Experimental";
+        btn.disabled = false;
+
+        if (data.status === 'success') {
+            if(plotExpImg && plotExpArea) {
+                plotExpImg.src = data.url;
+                plotExpArea.style.display = 'block';
+            }
+        } else {
+            alert("Erro ao plotar experimental: " + data.message);
+        }
+    })
+    .catch(err => {
+        btn.innerText = "📊 Plot Experimental";
+        btn.disabled = false;
+        alert("Erro de comunicação: " + err);
+    });
+}

@@ -1,122 +1,374 @@
-1 47 3d 368 experimentalexample.txt teory.out 1
-2 8  1s 531
+1 8 1s 531 expO1slimpoV2.mscd teory.out 1
+2 31 2p 1118
 3
 4
 
-223     10       0.001          scanmode,dispmode,ftolerance
-2       0       2       2       linitial,lnum,msorder,raorder
-10      0       3       0       layers,finals,fitmath,trymax
-17.4    17.4    0.0             kmin,kmax,kstep (per angstrom)
-9       78      3.0             dthetamin,dthetamax,dthetastep (degree)
-111.0   231.0   3.0             dphimin,dphimax,dphistep (degree)
-30.0    0.0     1               ltheta, lphi, beampol (degree)
-0.0     0.0     1.5             mtheta, mphi, acceptang (degree)
-9       25      4.086           radius,depth,lattice(angs)
-11      0.0     10.5    107.87  valence,bandgap(eV),density(g/cm3),mweight
-107.87  0.0     0.0     0.0     effective weight for kind 1-4 (amu)
+223     10      0.001           scanmode,dispmode,ftolerance
+
+0       0       6       4       linitial,lnum,msorder,raorder
+35      0       3       70      layers,finals,fitmath,trymax
+15.00   15.00   0.0             kmin,kmax,kstep (per angstrom)
+30.0    57.0    3.0             dthetamin,dthetamax,dthetastep (degree)
+2.5     359.5   3.0             dphimin,dphimax,dphistep (degree)
+0.0     0.0     1               ltheta, lphi, beampol (degree)
+0.0     0.0     3.0             mtheta, mphi, acceptang (degree)
+10      11      3.037           radius,depth,lattice(angs)
+24      4.7     5.88    187.444 valence,bandgap(eV),density(g/cm3), mweight (amu)
+16.0    69.72   0.00    0.00    efective weight for kind 1-4 (amu)
 0       0.0     0.0             ATA, ATAWeight1, ATAWeight2, t=(1-ATAWeight)*t1+ATAWeight*t2)
-0.0     0.0     0.0   0.0       magnetization amplitude for kind 1-4
-0.1     504.0   300.0   0.005   vinner(eV),tdebye,tsample(K),pathcut
+0.0     0.0     0.0     0.0     magnetization amplitude for kind 1-4
+4       237.0   300.0   0.001   vinner(eV),tdebye,tsample(K),pathcut
 0.0     0.0     0.0             fit try for vinner, tdebye and lattice
 
-///
-47 1  (1 ou 0, emmiter or not) 1 A
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0      0.000000
-interlayer spacing (A)
-0
-///
-47 1  (1 ou 0, emmiter or not) 2 B
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      0.000000
-interlayer spacing (A)
-0.6500000
-///
-8 0  (1 ou 0, emmiter or not) 3 C
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      180.000000
-interlayer spacing (A)
-0.7500000
-///
-47 1  (1 ou 0, emmiter or not) 4 A
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0      0.000000
-interlayer spacing (A)
-0.5200000
-///
-47 1  (1 ou 0, emmiter or not) 5 B
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      0.000000
-interlayer spacing (A)
-0.7200000
-///
-47 1  (1 ou 0, emmiter or not)  6 C
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      180.000000
-interlayer spacing (A)
-0.5700000
-///
-47 1  (1 ou 0, emmiter or not)  7 A
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0      0.000000
-interlayer spacing (A)
-0.690000
-///
-47 1  (1 ou 0, emmiter or not)  8 B
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      0.000000
-interlayer spacing (A)
-0.570000
-///
-47 1  (1 ou 0, emmiter or not) 9 C
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0.4082232      180.000000
-interlayer spacing (A)
-0.5000000
-///
-47 1  (1 ou 0, emmiter or not) 10 A
-unita(len ang)
-0.7070500     30.000000
-unitb(len ang)
-0.7070500     90.000000
-origin(len,ang) (in Angstrons)
-0      0.000000
-interlayer spacing (A)
-0.4600000
 
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.89562068      0.000000
+interlayer spacing (A)
+ 0.57490945
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.03819559      0.000000
+interlayer spacing (A)
+ 0.00000000
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.66183734     49.054000
+interlayer spacing (A)
+ 0.12000000
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.41685874      0.000000
+interlayer spacing (A)
+ 0.42000000
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.48864011     19.626000
+interlayer spacing (A)
+ 0.28000000
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.69344748     46.129000
+interlayer spacing (A)
+ 0.01000000
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.46592032      0.000000
+interlayer spacing (A)
+ 0.41000000
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.53276260     19.038000
+interlayer spacing (A)
+ 0.21995390
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.84458347      0.000000
+interlayer spacing (A)
+ 0.01580507
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.98748765      0.000000
+interlayer spacing (A)
+ 0.01580507
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.46427395     19.968000
+interlayer spacing (A)
+ 0.57490945
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.72077708     43.932000
+interlayer spacing (A)
+ 0.01580507
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.91438920      0.000000
+interlayer spacing (A)
+ 0.01580507
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.98814620     17.662000
+interlayer spacing (A)
+ 0.29799144
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.88277906      0.000000
+interlayer spacing (A)
+ 0.38788278
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.96147514      0.000000
+interlayer spacing (A)
+ 0.00329957
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.07046427     27.842000
+interlayer spacing (A)
+ 0.33289430
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.87059598      0.000000
+interlayer spacing (A)
+ 0.21995390
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 2.37833388     12.136000
+interlayer spacing (A)
+ 0.01580507
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.55087257     18.809000
+interlayer spacing (A)
+ 0.01580507
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.85676655      0.000000
+interlayer spacing (A)
+ 0.57490945
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 0.99967073      0.000000
+interlayer spacing (A)
+ 0.01580507
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.48205466     19.717000
+interlayer spacing (A)
+ 0.01580507
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 2.37833388      0.000000
+interlayer spacing (A)
+ 0.29799144
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 2.41587092     11.945000
+interlayer spacing (A)
+ 0.38788278
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.52617715     19.124000
+interlayer spacing (A)
+ 0.00329957
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.42739546      0.000000
+interlayer spacing (A)
+ 0.33289430
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 2.46163978     11.719000
+interlayer spacing (A)
+ 0.21995390
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 2.80605861      0.000000
+interlayer spacing (A)
+ 0.01580507
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.94863352      0.000000
+interlayer spacing (A)
+ 0.01580507
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 2.39051696     12.074000
+interlayer spacing (A)
+ 0.57490945
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.56536055     18.663000
+interlayer spacing (A)
+ 0.01580507
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 1.87586434      0.000000
+interlayer spacing (A)
+ 0.01580507
+///
+31 0  (1 ou 0, emmiter or not) A
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 2.90220612      9.921000
+interlayer spacing (A)
+ 0.29799144
+///
+8 1  (1 ou 0, emmiter or not) B
+unita(len ang)
+ 1.00000000     90.000000
+unitb(len ang)
+ 1.90912084      0.000000
+origin(len,ang) (in Angstrons)
+ 2.84425420      0.000000
+interlayer spacing (A)
+ 0.38788278
+///

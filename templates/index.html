@@ -23,9 +23,12 @@
                 <div style="margin-bottom: 15px; background: #e8f0fe; padding: 10px; border-radius: 8px; border: 1px dashed #3498db;">
                     <label for="experimentalFile" style="font-weight: bold; color: #2c3e50; font-size: 13px;">📂 Upload Experimental Data (if you don't upload, the example file will be used):</label>
                     <input type="file" id="experimentalFile" name="experimentalFile" class="form-control" style="font-size: 13px; margin-top: 5px;">
-		    <small style="color: #666; font-size: 11px;">The file will be save on the root directory to be used in the simulation</small>
+                    <small style="color: #666; font-size: 11px;">The file will be save on the root directory to be used in the simulation</small>
                 </div>
 
+                <button type="button" id="btn-plot-exp" onclick="plotarExp()" style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 15px;">
+                    📊 Plot Experimental
+                </button>
                 <textarea id="inputCluster" name="inputCluster" placeholder="Paste your input_cluster.txt content here..."></textarea>
                 
                 <div class="button-group">
@@ -36,12 +39,12 @@
                     <button type="button" onclick="executarSimulacao('/rodar_full')" style="background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">
                         🚀 Run Full
                     </button>
-		    <button type="button" onclick="plotarGrafico()" style="background: #9b59b6; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                    <button type="button" onclick="plotarGrafico()" style="background: #9b59b6; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">
                         📊 Plot Pattern
                     </button>
 
                     <button type="button" onclick="visualizarEstrutura()" style="background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">
-                        👁️ 3D View
+                        👁 3D View
                     </button>
                 </div>
                 
@@ -49,7 +52,7 @@
 
                 <div id="terminal-container" style="display: none; margin-top: 20px; background: #000; border-radius: 8px; padding: 10px; border: 1px solid #333;">
                     <div style="color: #bbb; font-size: 12px; margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 5px;">
-                        🖥️ Live Terminal Output
+                        🖥 Live Terminal Output
                     </div>
                     <pre id="terminal-log" style="color: #0f0; font-family: 'Consolas', monospace; font-size: 12px; height: 250px; overflow-y: auto; white-space: pre-wrap; margin: 0;">Waiting the start...</pre>
                 </div>
@@ -60,7 +63,7 @@
                         📥 Download Results (ZIP)
                     </a>
                 </div>
-		<div id="error-file-not-found" style="display: none; margin-top: 15px; text-align: center; padding: 15px; background: #ffebee; border: 1px solid #ef5350; border-radius: 8px;">
+                <div id="error-file-not-found" style="display: none; margin-top: 15px; text-align: center; padding: 15px; background: #ffebee; border: 1px solid #ef5350; border-radius: 8px;">
                     <h3 style="margin: 0 0 10px 0; color: #c62828;">❌ Error: File Not Found</h3>
                     <p style="color: #c62828; font-weight: bold;">
                         Please check the names of the experimental files in the input and upload, or if there are any additional elements in the list that are not in the logical layers.
@@ -94,6 +97,10 @@
             <a href="/download_exemplo" class="btn-exemplo">📦 Download Examples (ZIP)</a>
         </div>
 
+        <div id="plot-exp-area" style="display: none; margin-top: 20px; text-align: center; background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <h3 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🔬 Experimental Pattern</h3>
+            <img id="plot-exp-img" src="" alt="Experimental Plot" style="max-width: 100%; height: auto; border: 1px solid #eee; border-radius: 4px;">
+        </div>
         <div id="plot-area" style="display: none; margin-top: 20px; text-align: center; background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
             <h3 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">📉 Pattern Preview</h3>
             
