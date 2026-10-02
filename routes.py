@@ -83,7 +83,7 @@ def iv_salva(sessao):
                                      d.get('centro'))
     except iv_service.ErroIV as erro:
         return _erro_iv(erro)
-    return send_file(buf, mimetype='application/zip', as_attachment=True, download_name=f'{nome}.zip')
+    return send_file(buf, mimetype='text/plain', as_attachment=True, download_name=f'{nome}.txt')
 
 # --- ROTAS FULL (ASSÍNCRONAS - TERMINAL WEB) ---
 

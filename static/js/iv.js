@@ -534,7 +534,7 @@ async function salva() {
         desenhaInfo();
         return;
     }
-    const nome = prompt('Spot name (saves <name>.txt, <name>_pontos.txt and <name>.png in a ZIP):',
+    const nome = prompt('Spot name (saves the curve as <name>.txt):',
         `spot_${S.salvos.length + 1}`);
     if (nome === null) {
         S.mensagem = 'Save cancelled.';
@@ -554,10 +554,10 @@ async function salva() {
     }
     const blob = await resp.blob();
     const arq = (resp.headers.get('Content-Disposition') || '').match(/filename="?([^";]+)"?/);
-    const nomeZip = arq ? arq[1] : `${nome}.zip`;
+    const nomeArq = arq ? arq[1] : `${nome}.txt`;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = nomeZip;
+    a.download = nomeArq;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -566,8 +566,8 @@ async function salva() {
     if (S.metodo === 'fisico' && Object.keys(S.ancoras).length >= 2 && S.centroAjustado) {
         S.centro = S.centroAjustado;
     }
-    S.salvos.push({ nome: nomeZip.replace(/\.zip$/, ''), norm: normalizadaSalva() });
-    S.mensagem = `Saved ${nomeZip}. 'New spot' to measure another one.`;
+    S.salvos.push({ nome: nomeArq.replace(/\.txt$/, ''), norm: normalizadaSalva() });
+    S.mensagem = `Saved ${nomeArq}. 'New spot' to measure another one.`;
     desenha();
 }
 

@@ -10,13 +10,9 @@ import shutil
 import tempfile
 import time
 import uuid
-import zipfile
 from pathlib import Path
 
 import numpy as np
-# Figure direto, sem pyplot: o pyplot guarda a figura atual num estado global, e
-# com o gunicorn em threads dois Save spot ao mesmo tempo desenhariam um na do outro.
-from matplotlib.figure import Figure
 from PIL import Image
 
 import leed_iv_core as core
@@ -160,7 +156,7 @@ def calcula(sessao, ancoras, metodo, fundo, largura, centro=None):
 
 
 def salva(sessao, nome, ancoras, metodo, fundo, largura, suavizar, centro=None):
-    """Zip com <nome>.txt, <nome>_pontos.txt e <nome>.png, no formato do leed_iv.py."""
+    """So o <nome>.txt da curva, no formato do leed_iv.py (os pontos marcados vao no cabecalho)."""
     d = _pasta(sessao)
     imagens = _imagens(d)
     energias = list(imagens)
@@ -189,7 +185,7 @@ def salva(sessao, nome, ancoras, metodo, fundo, largura, suavizar, centro=None):
               + "; ".join(f"{a}: {ancoras[a][0]:.0f}, {ancoras[a][1]:.0f}" for a in sorted(ancoras)) + "\n")
     txt.write("# intensity and smoothed: same calculation as coleta_no_step (IDL), without losing the last energy\n")
     txt.write("# normalized = intensity / current, divided by the maximum; normalized_smooth = 3-point average\n")
-    txt.write(f"# smoothing on screen when saved: {'yes' if suavizar else 'no'} (the png shows the smoothed curve if yes)\n")
+    txt.write(f"# smoothing on screen when saved: {'yes' if suavizar else 'no'}\n")
     txt.write("# energy energy_xml column row intensity smoothed current_uA intensity_per_uA normalized normalized_smooth\n")
     for k, e in enumerate(es):
         ex = xml[e]["Energy"]
@@ -197,40 +193,5 @@ def salva(sessao, nome, ancoras, metodo, fundo, largura, suavizar, centro=None):
                   f"{inten[k]:10.0f} {suave[k]:12.4f} {corr[k]:6.2f} {por_corr[k]:12.2f} "
                   f"{norm[k]:10.5f} {norm_suave[k]:10.5f}\n")
 
-    pontos = io.StringIO()
-    pontos.write("# points marked on the IV Curve page; same format as pontos_marcados_10.txt\n")
-    pontos.write("# energy_eV  column  row\n")
-    for a in sorted(ancoras):
-        pontos.write(f"{a} {ancoras[a][0]:.0f} {ancoras[a][1]:.0f}\n")
-
-    png = _figura_resumo(nome, imagens, energias, pos, ancoras, metodo, fundo, suavizar, norm, norm_suave)
-
-    buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr(f"{nome}.txt", txt.getvalue())
-        zf.writestr(f"{nome}_pontos.txt", pontos.getvalue())
-        zf.writestr(f"{nome}.png", png)
-    buf.seek(0)
+    buf = io.BytesIO(txt.getvalue().encode("utf-8"))
     return nome, buf
-
-
-def _figura_resumo(nome, imagens, energias, pos, ancoras, metodo, fundo, suavizar, norm, norm_suave):
-    fig = Figure(figsize=(12, 4.5))
-    a1, a2 = fig.subplots(1, 2)
-    e0 = min(ancoras)
-    a1.imshow(core.carrega_cinza(imagens[e0]), cmap="gray")
-    a1.plot([pos[e][0] for e in energias], [pos[e][1] for e in energias], "c-", lw=1)
-    a1.plot([ancoras[a][0] for a in ancoras], [ancoras[a][1] for a in ancoras], "yx", mew=2)
-    a1.set_title(f"{nome}: trajectory over {e0} eV"), a1.set_xticks([]), a1.set_yticks([])
-    if suavizar:
-        a2.plot(energias, norm, "-", color="0.7", lw=1, label="measured")
-        a2.plot(energias, norm_suave, "k-", lw=1.2, label="smoothed (3 points)")
-        a2.legend(fontsize=8)
-    else:
-        a2.plot(energias, norm, "k-", lw=1)
-    a2.set_xlabel("energy (eV)"), a2.set_ylabel("normalized intensity")
-    a2.set_title(f"method {metodo}, background {fundo}" + (", smoothed" if suavizar else ""))
-    fig.tight_layout()
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=120)
-    return buf.getvalue()
