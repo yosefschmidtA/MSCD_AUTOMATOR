@@ -42,6 +42,10 @@ def iv():
 def _erro_iv(erro, codigo=400):
     return jsonify({"erro": str(erro)}), codigo
 
+def _faixa_iv(d):
+    # Faixa de energia do spot; sem ela, todas as energias carregadas.
+    return tuple(None if d.get(k) is None else int(d[k]) for k in ('emin', 'emax'))
+
 @bp.route('/iv/upload', methods=['POST'])
 def iv_upload():
     try:
@@ -70,7 +74,8 @@ def iv_calcula(sessao):
     d = request.get_json()
     try:
         return jsonify(iv_service.calcula(sessao, d.get('ancoras'), d.get('metodo', 'fisico'),
-                                          d.get('fundo', 'c'), int(d['largura']), d.get('centro')))
+                                          d.get('fundo', 'c'), int(d['largura']), d.get('centro'),
+                                          *_faixa_iv(d)))
     except iv_service.ErroIV as erro:
         return _erro_iv(erro)
 
@@ -80,7 +85,7 @@ def iv_salva(sessao):
     try:
         nome, buf = iv_service.salva(sessao, d.get('nome'), d.get('ancoras'), d.get('metodo', 'fisico'),
                                      d.get('fundo', 'c'), int(d['largura']), bool(d.get('suavizar')),
-                                     d.get('centro'))
+                                     d.get('centro'), *_faixa_iv(d))
     except iv_service.ErroIV as erro:
         return _erro_iv(erro)
     return send_file(buf, mimetype='text/plain', as_attachment=True, download_name=f'{nome}.txt')

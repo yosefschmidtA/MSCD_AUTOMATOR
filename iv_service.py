@@ -117,6 +117,15 @@ def _ancoras(bruto):
     return {int(e): (float(c), float(l)) for e, (c, l) in (bruto or {}).items()}
 
 
+def _faixa(imagens, emin, emax):
+    """So as energias de emin a emax (cada spot tem a sua faixa), como o --emin/--emax do leed_iv.py."""
+    faixa = {e: p for e, p in imagens.items()
+             if (emin is None or e >= emin) and (emax is None or e <= emax)}
+    if not faixa:
+        raise ErroIV(f"No images between {emin} and {emax} eV.")
+    return faixa
+
+
 def marca(sessao, energia, x, y):
     """O clique a mao erra 1-2 px; puxa para o pico mais proximo se houver um claro."""
     d = _pasta(sessao)
@@ -125,11 +134,12 @@ def marca(sessao, energia, x, y):
     return [float(core.round_idl(c)), float(core.round_idl(l))]
 
 
-def calcula(sessao, ancoras, metodo, fundo, largura, centro=None):
+def calcula(sessao, ancoras, metodo, fundo, largura, centro=None, emin=None, emax=None):
     """Trajetoria e intensidade; mesmas regras e mensagens do Coleta.recalcula."""
     d = _pasta(sessao)
-    imagens = _imagens(d)
-    ancoras = _ancoras(ancoras)
+    imagens = _faixa(_imagens(d), emin, emax)
+    # Marcacao fora da faixa nao entra no ajuste (o navegador ja as descarta).
+    ancoras = {e: a for e, a in _ancoras(ancoras).items() if e in imagens}
     centro = tuple(centro) if centro else None
     if not ancoras:
         return {"mensagem": "Click on the center of the spot you want to measure."}
@@ -155,17 +165,18 @@ def calcula(sessao, ancoras, metodo, fundo, largura, centro=None):
     return resposta
 
 
-def salva(sessao, nome, ancoras, metodo, fundo, largura, suavizar, centro=None):
+def salva(sessao, nome, ancoras, metodo, fundo, largura, suavizar, centro=None, emin=None, emax=None):
     """So o <nome>.txt da curva, no formato do leed_iv.py (os pontos marcados vao no cabecalho)."""
     d = _pasta(sessao)
-    imagens = _imagens(d)
+    imagens = _faixa(_imagens(d), emin, emax)
     energias = list(imagens)
+    # Corrente e normalizacao so dentro da faixa, como no leed_iv.py com --emin/--emax.
     xml = _xml(d, energias)
     tem_corrente = all(v["BeamCurrent"] for v in xml.values())
-    ancoras = _ancoras(ancoras)
+    ancoras = {e: a for e, a in _ancoras(ancoras).items() if e in imagens}
     nome = re.sub(r"[^\w.-]", "_", nome or "spot_1").removesuffix(".txt") or "spot_1"
 
-    r = calcula(sessao, ancoras, metodo, fundo, largura, centro)
+    r = calcula(sessao, ancoras, metodo, fundo, largura, centro, emin, emax)
     if "pos" not in r:
         raise ErroIV("Nothing to save: mark the spot first.")
     pos, inten_d = r["pos"], r["inten"]
@@ -181,6 +192,7 @@ def salva(sessao, nome, ancoras, metodo, fundo, largura, suavizar, centro=None):
     txt = io.StringIO()
     txt.write(f"# LEED IV curve - {nome}\n")
     txt.write(f"# position method: {metodo} | background: {fundo} | window: {largura} px\n")
+    txt.write(f"# energy range: {energias[0]} to {energias[-1]} eV\n")
     txt.write("# marked points (energy: column, row): "
               + "; ".join(f"{a}: {ancoras[a][0]:.0f}, {ancoras[a][1]:.0f}" for a in sorted(ancoras)) + "\n")
     txt.write("# intensity and smoothed: same calculation as coleta_no_step (IDL), without losing the last energy\n")

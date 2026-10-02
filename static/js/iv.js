@@ -15,7 +15,7 @@ const S = {
     sessao: null, energias: [], largura: 15, forma: [0, 0], xml: {}, temCorrente: false,
     ancoras: {}, metodo: 'fisico', fundo: 'c', normalizar: false, suavizar: false,
     centro: null, centroAjustado: null, pos: {}, inten: {}, salvos: [], mensagem: '', i: 0,
-    pedido: 0,
+    emin: 0, emax: 0, pedido: 0,
 };
 const cacheImg = new Map();  // energia -> Promise<{w, h, cinza, tela}>
 
@@ -88,15 +88,16 @@ function inicia(r) {
         sessao: r.sessao, energias: r.energias, largura: r.largura, forma: r.forma, xml: r.xml,
         temCorrente: r.tem_corrente, ancoras: {}, normalizar: r.tem_corrente, centro: null,
         centroAjustado: null, pos: {}, inten: {}, salvos: [], i: 0,
-        mensagem: 'Click on the center of the spot you want to measure.',
+        emin: r.energias[0], emax: r.energias.at(-1),
+        mensagem: 'Set the energy range of the spot, then click on its center.',
     });
+    $('iv-emin').value = S.emin;
+    $('iv-emax').value = S.emax;
     let txt = `${r.energias.length} energies loaded (${r.energias[0]} to ${r.energias.at(-1)} eV).`;
     if (r.sem_xml.length) {
         txt += ` ${r.sem_xml.length} without beam current in the XML: normalization by current disabled.`;
     }
     status(txt);
-    $('iv-slider').max = r.energias.length - 1;
-    $('iv-slider').value = 0;
     $('iv-ck-corrente').checked = S.normalizar;
     $('iv-ck-corrente-label').hidden = !S.temCorrente;
     $('iv-ferramenta').hidden = false;
@@ -171,6 +172,7 @@ async function recalcula() {
     try {
         const r = await (await post('calcula', {
             ancoras: S.ancoras, metodo: S.metodo, fundo: S.fundo, largura: S.largura, centro: S.centro,
+            emin: S.emin, emax: S.emax,
         })).json();
         if (n !== S.pedido) return;  // ja chegou um pedido mais novo
         S.pos = Object.fromEntries(Object.entries(r.pos || {}).map(([e, p]) => [Number(e), p]));
@@ -200,6 +202,16 @@ function preparaCanvas(cv, largCss, altCss) {
 }
 
 function energiaAtual() { return S.energias[S.i]; }
+
+// Faixa de energia do spot atual. S.i continua indexando S.energias (todas as
+// carregadas); vaiPara so nao deixa sair da faixa.
+const naFaixa = e => e >= S.emin && e <= S.emax;
+const faixa = () => S.energias.filter(naFaixa);
+
+function limitesFaixa() {
+    const i0 = S.energias.findIndex(naFaixa);
+    return [i0, i0 + faixa().length - 1];
+}
 
 function centroAtual() {
     const e = energiaAtual();
@@ -326,7 +338,8 @@ function desenhaInfo() {
     if (c) l.push(`position    col ${roundIdl(c[0])}  row ${roundIdl(c[1])}`);
     if (e in S.inten) l.push(`intensity   ${S.inten[e]}`);
     const marcadas = Object.keys(S.ancoras).map(Number).sort((a, b) => a - b);
-    l.push('', `marked points: ${marcadas.length}`);
+    l.push('', `energy range ${S.emin} to ${S.emax} eV`);
+    l.push(`marked points: ${marcadas.length}`);
     marcadas.forEach(a => l.push(`  ${a} eV: (${S.ancoras[a][0].toFixed(0)}, ${S.ancoras[a][1].toFixed(0)})`));
     l.push('', `window ${S.largura}x${S.largura} px`);
     if (S.centro) l.push(`pattern center (${S.centro[0].toFixed(0)}, ${S.centro[1].toFixed(0)})`);
@@ -344,25 +357,31 @@ function suaviza3(v) {
 
 const maximo = v => Math.max(...v.filter(Number.isFinite));
 
+// Curvas como {es, y}: cada spot tem a sua faixa de energia.
 function curvaAtual() {
-    if (!S.energias.every(e => e in S.inten)) return null;
-    let y = S.energias.map(e => S.inten[e]);
-    if (S.normalizar && S.temCorrente) y = y.map((v, k) => v / S.xml[S.energias[k]].BeamCurrent);
+    const es = faixa();
+    if (!es.length || !es.every(e => e in S.inten)) return null;
+    let y = es.map(e => S.inten[e]);
+    if (S.normalizar && temCorrenteFaixa(es)) y = y.map((v, k) => v / S.xml[es[k]].BeamCurrent);
     if (S.suavizar) y = suaviza3(y);
     const m = maximo(y);
-    return y.map(v => v / m);
+    return { es, y: y.map(v => v / m) };
 }
+
+// Como no servidor: a corrente so conta se existir em todas as energias da faixa.
+const temCorrenteFaixa = es => es.every(e => S.xml[e] && S.xml[e].BeamCurrent);
 
 // Mesmo calculo do arquivo salvo (coluna "normalized").
 function normalizadaSalva() {
-    const inten = S.energias.map(e => S.inten[e]);
-    if (S.temCorrente) {
-        const pc = inten.map((v, k) => v / S.xml[S.energias[k]].BeamCurrent);
+    const es = faixa();
+    const inten = es.map(e => S.inten[e]);
+    if (temCorrenteFaixa(es)) {
+        const pc = inten.map((v, k) => v / S.xml[es[k]].BeamCurrent);
         const m = maximo(pc);
-        return pc.map(v => v / m);
+        return { es, norm: pc.map(v => v / m) };
     }
     const m = maximo(inten);
-    return inten.map(v => v / m);
+    return { es, norm: inten.map(v => v / m) };
 }
 
 function ticks(min, max, alvo) {
@@ -384,12 +403,13 @@ function desenhaCurva(hoverE = null) {
     const es = S.energias;
     if (!es.length) return;
 
+    // O eixo cobre todas as energias carregadas: spots com faixas diferentes lado a lado.
     const series = S.salvos.map((sv, k) => ({
-        nome: sv.nome, cor: CORES_SALVOS[k % CORES_SALVOS.length], larg: 1.5, alfa: 0.6,
+        nome: sv.nome, cor: CORES_SALVOS[k % CORES_SALVOS.length], larg: 1.5, alfa: 0.6, es: sv.es,
         y: (() => { const y = S.suavizar ? suaviza3(sv.norm) : sv.norm; const m = maximo(y); return y.map(v => v / m); })(),
     }));
     const atual = curvaAtual();
-    if (atual) series.push({ nome: 'current spot', cor: COR_ATUAL, larg: 1.8, alfa: 1, y: atual });
+    if (atual) series.push({ nome: 'current spot', cor: COR_ATUAL, larg: 1.8, alfa: 1, ...atual });
 
     let ymin = 0, ymax = 1;
     const todos = series.flatMap(s => s.y).filter(Number.isFinite);
@@ -429,6 +449,11 @@ function desenhaCurva(hoverE = null) {
         + (S.suavizar ? ' smoothed' : '') + ' (norm.)', 0, 0);
     cx.restore();
 
+    // Fora da faixa do spot atual, sombreado.
+    cx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    if (S.emin > geo.emin) cx.fillRect(geo.x0, geo.y0, X(S.emin) - geo.x0, geo.y1 - geo.y0);
+    if (S.emax < geo.emax) cx.fillRect(X(S.emax), geo.y0, geo.x1 - X(S.emax), geo.y1 - geo.y0);
+
     // Energia atual.
     cx.strokeStyle = COR_ENERGIA; cx.lineWidth = 1;
     cx.beginPath(); cx.moveTo(X(energiaAtual()), geo.y0); cx.lineTo(X(energiaAtual()), geo.y1); cx.stroke();
@@ -439,7 +464,7 @@ function desenhaCurva(hoverE = null) {
         let caneta = false;
         s.y.forEach((v, k) => {
             if (!Number.isFinite(v)) { caneta = false; return; }
-            caneta ? cx.lineTo(X(es[k]), Y(v)) : cx.moveTo(X(es[k]), Y(v));
+            caneta ? cx.lineTo(X(s.es[k]), Y(v)) : cx.moveTo(X(s.es[k]), Y(v));
             caneta = true;
         });
         cx.stroke();
@@ -450,7 +475,7 @@ function desenhaCurva(hoverE = null) {
     if (atual) {
         cx.strokeStyle = COR_ANCORA; cx.lineWidth = 2;
         Object.keys(S.ancoras).map(Number).forEach(a => {
-            const v = atual[es.indexOf(a)];
+            const v = atual.y[atual.es.indexOf(a)];
             if (!Number.isFinite(v)) return;
             const x = X(a), y = Y(v), r = 4;
             cx.beginPath();
@@ -482,14 +507,13 @@ function desenhaCurva(hoverE = null) {
         cx.strokeStyle = 'rgba(0,0,0,0.35)'; cx.lineWidth = 1; cx.setLineDash([3, 3]);
         cx.beginPath(); cx.moveTo(X(hoverE), geo.y0); cx.lineTo(X(hoverE), geo.y1); cx.stroke();
         cx.setLineDash([]);
-        const k = es.indexOf(hoverE);
         series.forEach(s => {
-            const v = s.y[k];
+            const v = s.y[s.es.indexOf(hoverE)];
             if (!Number.isFinite(v)) return;
             cx.fillStyle = s.cor; cx.strokeStyle = 'white'; cx.lineWidth = 2;
             cx.beginPath(); cx.arc(X(hoverE), Y(v), 4, 0, 2 * Math.PI); cx.fill(); cx.stroke();
         });
-        return series.map(s => ({ nome: s.nome, cor: s.cor, v: s.y[k] }));
+        return series.map(s => ({ nome: s.nome, cor: s.cor, v: s.y[s.es.indexOf(hoverE)] }));
     }
     return null;
 }
@@ -504,9 +528,34 @@ function energiaMaisProxima(xCss) {
 // ------------------------------------------------------------------ eventos
 
 function vaiPara(i) {
-    S.i = Math.max(0, Math.min(S.energias.length - 1, i));
+    const [i0, i1] = limitesFaixa();
+    $('iv-slider').min = i0;
+    $('iv-slider').max = i1;
+    S.i = Math.max(i0, Math.min(i1, i));
     $('iv-slider').value = S.i;
     desenha();
+}
+
+function mudaFaixa() {
+    if (!S.sessao) return;
+    let a = parseFloat($('iv-emin').value), b = parseFloat($('iv-emax').value);
+    if (!Number.isFinite(a)) a = S.energias[0];
+    if (!Number.isFinite(b)) b = S.energias.at(-1);
+    if (a > b) [a, b] = [b, a];
+    // Encosta nas energias que existem (o passo pode ser 2 eV, 5 eV...).
+    const dentro = S.energias.filter(e => e >= a && e <= b);
+    if (!dentro.length) {
+        S.mensagem = `No images between ${a} and ${b} eV; range kept at ${S.emin} to ${S.emax} eV.`;
+    } else {
+        S.emin = dentro[0];
+        S.emax = dentro.at(-1);
+        // Marcacao fora da faixa nao vale mais para este spot.
+        Object.keys(S.ancoras).map(Number).filter(e => !naFaixa(e)).forEach(e => delete S.ancoras[e]);
+    }
+    $('iv-emin').value = S.emin;
+    $('iv-emax').value = S.emax;
+    vaiPara(S.i);
+    if (dentro.length) recalcula();
 }
 
 async function cliqueImagem(ev) {
@@ -553,7 +602,7 @@ async function salva() {
     try {
         resp = await post('salva', {
             nome, ancoras: S.ancoras, metodo: S.metodo, fundo: S.fundo, largura: S.largura,
-            suavizar: S.suavizar, centro: S.centro,
+            suavizar: S.suavizar, centro: S.centro, emin: S.emin, emax: S.emax,
         });
     } catch (erro) {
         S.mensagem = `Error: ${erro.message}`;
@@ -574,7 +623,7 @@ async function salva() {
     if (S.metodo === 'fisico' && Object.keys(S.ancoras).length >= 2 && S.centroAjustado) {
         S.centro = S.centroAjustado;
     }
-    S.salvos.push({ nome: nomeArq.replace(/\.txt$/, ''), norm: normalizadaSalva() });
+    S.salvos.push({ nome: nomeArq.replace(/\.txt$/, ''), ...normalizadaSalva() });
     S.mensagem = `Saved ${nomeArq}. 'New spot' to measure another one.`;
     desenha();
 }
@@ -649,6 +698,8 @@ function liga() {
         }
     });
     $('iv-salva').addEventListener('click', salva);
+    $('iv-emin').addEventListener('change', mudaFaixa);
+    $('iv-emax').addEventListener('change', mudaFaixa);
 
     let espera;
     window.addEventListener('resize', () => { clearTimeout(espera); espera = setTimeout(desenha, 100); });
