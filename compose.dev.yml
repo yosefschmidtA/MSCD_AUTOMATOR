@@ -1,0 +1,15 @@
+services:
+  mscd-solver:
+    ports:
+      - 5000:5000
+    volumes:
+      # O codigo do host por cima do copiado no build: mudou um .py, o Flask
+      # recarrega sozinho, sem ./run build.
+      - .:/app
+    environment:
+      # Sem isto o conteiner, que roda como root, deixa __pycache__/*.pyc de
+      # root na pasta do projeto.
+      PYTHONDONTWRITEBYTECODE: "1"
+    # Servidor do Flask com --debug (recarga e traceback no navegador) no lugar
+    # do gunicorn do Dockerfile, que fica so para o prod.
+    command: [ "flask", "--app", "app", "run", "--debug", "--host", "0.0.0.0", "--port", "5000" ]

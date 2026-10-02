@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSCD Web Automator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="home">
+    <h1>Surface Analysis Tools</h1>
+    <p class="home-sub">Choose a tool</p>
+
+    <div class="home-buttons">
+        <a href="{{ url_for('main.mscd') }}" class="home-btn home-btn-mscd">
+            <span class="home-btn-title">MSCD SOLVER</span>
+            <span class="home-btn-desc">XPD phase shift, radial matrix and full simulation</span>
+        </a>
+        <a href="{{ url_for('main.iv') }}" class="home-btn home-btn-iv">
+            <span class="home-btn-title">IV CURVE</span>
+            <span class="home-btn-desc">LEED I(V) curve extraction from spot images</span>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

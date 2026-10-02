@@ -18,6 +18,7 @@ RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y \
     python3-pandas \
     python3-matplotlib \
     python3-scipy \
+    python3-pil \
     git \
     && rm -rf /var/lib/apt/lists/*
 
@@ -42,4 +43,8 @@ ENV LD_LIBRARY_PATH=/app/arquivos:$LD_LIBRARY_PATH
 
 EXPOSE 5000
 
-CMD ["gunicorn", "--workers", "1", "--timeout", "120", "--bind", "0.0.0.0:5000", "app:app"]
+# Um processo so, com threads: o cache de imagens do IV Curve e a trava do MSCD
+# (simulacao_ativa, _trava_mscd) vivem na memoria do processo e nao se dividem
+# entre workers. As threads deixam um Load lento de uma pessoa nao travar os
+# cliques das outras.
+CMD ["gunicorn", "--workers", "1", "--threads", "8", "--timeout", "120", "--bind", "0.0.0.0:5000", "app:app"]

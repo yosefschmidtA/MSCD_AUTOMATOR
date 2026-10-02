@@ -4,5 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     image: mscd-solver:latest
+    container_name: mscd-solver
     volumes:
       - ./arquivos:/app/arquivos
+    environment:
+      TZ: America/Sao_Paulo

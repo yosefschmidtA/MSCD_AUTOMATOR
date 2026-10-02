@@ -1,21 +1,94 @@
 from flask import Blueprint, render_template, request, send_file, jsonify
 import os
 import io
+import threading
 import zipfile
+from functools import wraps
 
 # Importa nossos serviços
 import file_service
 import simulation_service
+import iv_service
 
 bp = Blueprint('main', __name__)
 
+# O gunicorn roda com threads por causa do IV Curve. As rotas do MSCD gravam nos
+# mesmos arquivos fixos (input_cluster.txt, arquivos/, os png de static/), e ate
+# aqui so nao se atropelavam porque o worker sincrono atendia um pedido por vez.
+# Esta trava mantem exatamente isso para elas; o IV Curve nao passa por ela.
+_trava_mscd = threading.Lock()
+
+def uma_por_vez(rota):
+    @wraps(rota)
+    def envolta(*args, **kwargs):
+        with _trava_mscd:
+            return rota(*args, **kwargs)
+    return envolta
+
 @bp.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('home.html')
+
+@bp.route('/mscd')
+def mscd():
+    return render_template('mscd.html')
+
+@bp.route('/iv')
+def iv():
+    return render_template('iv.html')
+
+# --- ROTAS IV CURVE (leitor de curvas IV de LEED) ---
+
+def _erro_iv(erro, codigo=400):
+    return jsonify({"erro": str(erro)}), codigo
+
+@bp.route('/iv/upload', methods=['POST'])
+def iv_upload():
+    try:
+        sessao = iv_service.cria_sessao(request.files.getlist('imagens'), request.files.getlist('xmls'))
+        return jsonify(iv_service.info(sessao))
+    except iv_service.ErroIV as erro:
+        return _erro_iv(erro)
+
+@bp.route('/iv/<sessao>/img/<int:energia>.png')
+def iv_imagem(sessao, energia):
+    try:
+        return send_file(iv_service.png_cinza(sessao, energia), mimetype='image/png', max_age=3600)
+    except iv_service.ErroIV as erro:
+        return _erro_iv(erro, 404)
+
+@bp.route('/iv/<sessao>/marca', methods=['POST'])
+def iv_marca(sessao):
+    d = request.get_json()
+    try:
+        return jsonify(iv_service.marca(sessao, int(d['energia']), float(d['x']), float(d['y'])))
+    except iv_service.ErroIV as erro:
+        return _erro_iv(erro)
+
+@bp.route('/iv/<sessao>/calcula', methods=['POST'])
+def iv_calcula(sessao):
+    d = request.get_json()
+    try:
+        return jsonify(iv_service.calcula(sessao, d.get('ancoras'), d.get('metodo', 'fisico'),
+                                          d.get('fundo', 'c'), int(d['largura']), d.get('centro')))
+    except iv_service.ErroIV as erro:
+        return _erro_iv(erro)
+
+@bp.route('/iv/<sessao>/salva', methods=['POST'])
+def iv_salva(sessao):
+    d = request.get_json()
+    try:
+        nome, buf = iv_service.salva(sessao, d.get('nome'), d.get('ancoras'), d.get('metodo', 'fisico'),
+                                     d.get('fundo', 'c'), int(d['largura']), bool(d.get('suavizar')),
+                                     d.get('centro'))
+    except iv_service.ErroIV as erro:
+        return _erro_iv(erro)
+    return send_file(buf, mimetype='application/zip', as_attachment=True, download_name=f'{nome}.zip')
 
 # --- ROTAS FULL (ASSÍNCRONAS - TERMINAL WEB) ---
 
 @bp.route('/rodar_full', methods=['POST'])
+@uma_por_vez
 def iniciar_full():
     # 1. Salva inputs
     file_service.salvar_arquivo_experimental(request)
@@ -52,6 +125,7 @@ def baixar_resultado_full():
 # (Mantenha igual ao que já estava funcionando)
 
 @bp.route('/rodar', methods=['POST'])
+@uma_por_vez
 def rodar_simulacao():
     file_service.salvar_arquivo_experimental(request)
     conteudo = request.form.get('inputCluster')
@@ -81,6 +155,7 @@ def download_exemplo():
     return send_file(mem_file, mimetype='application/zip', as_attachment=True, download_name='exemplos_mscd.zip')
 
 @bp.route('/gerar_grafico', methods=['POST'])
+@uma_por_vez
 def gerar_grafico_rota():
     # Chama o serviço que roda o teo.py
     sucesso, msg = simulation_service.gerar_grafico()
@@ -96,6 +171,7 @@ def gerar_grafico_rota():
         return jsonify({"status": "error", "message": msg}), 500
 
 @bp.route('/plotar_experimental', methods=['POST'])
+@uma_por_vez
 def plotar_experimental():
     # 1. Verifica se o navegador enviou o arquivo
     if 'file' not in request.files:

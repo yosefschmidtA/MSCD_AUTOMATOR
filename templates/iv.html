@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IV Curve</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="iv-page">
+    <a href="{{ url_for('main.index') }}" class="back-link">&larr; Home</a>
+
+    <div class="container iv-setup">
+        <h1>IV Curve</h1>
+        <p class="iv-sub">LEED I(V) curve reader. Image and XML files must be named after the energy (e.g. <code>100.jpg</code> and <code>100.xml</code>).</p>
+
+        <div class="iv-folders">
+            <label class="iv-drop">
+                <span class="iv-drop-title">📂 Insert here the images folder</span>
+                <span class="iv-drop-hint">.jpg or .tif files named &lt;energy&gt;</span>
+                <input type="file" id="iv-pasta-img" webkitdirectory directory multiple>
+                <span class="iv-drop-count" id="iv-conta-img">No folder selected</span>
+            </label>
+            <label class="iv-drop">
+                <span class="iv-drop-title">📂 Insert here the XML folder</span>
+                <span class="iv-drop-hint">beam current for normalization (optional; XML files inside the images folder are also used)</span>
+                <input type="file" id="iv-pasta-xml" webkitdirectory directory multiple>
+                <span class="iv-drop-count" id="iv-conta-xml">No folder selected</span>
+            </label>
+        </div>
+
+        <div class="iv-load-row">
+            <button type="button" id="iv-carrega" class="iv-btn iv-btn-primary" disabled>Load</button>
+            <div class="iv-progress" id="iv-progresso" hidden><div id="iv-progresso-barra"></div></div>
+            <span id="iv-status" class="iv-status"></span>
+        </div>
+    </div>
+
+    <div class="iv-tool" id="iv-ferramenta" hidden>
+        <div class="iv-col-img">
+            <div class="iv-img-title" id="iv-titulo">&nbsp;</div>
+            <canvas id="iv-img" class="iv-canvas-img"></canvas>
+            <div class="iv-slider-row">
+                <label for="iv-slider">Energy (eV)</label>
+                <input type="range" id="iv-slider" min="0" max="0" step="1" value="0">
+                <span id="iv-slider-valor" class="iv-mono"></span>
+            </div>
+            <div class="iv-checks">
+                <label id="iv-ck-corrente-label"><input type="checkbox" id="iv-ck-corrente"> divide by beam current</label>
+                <label><input type="checkbox" id="iv-ck-suave"> smooth (3-point average)</label>
+            </div>
+            <p class="iv-help">Left click: mark the spot center at this energy &middot; right click: delete it &middot;
+                &larr; / &rarr; or mouse wheel: change energy &middot; click on the curve: jump to that energy</p>
+        </div>
+
+        <div class="iv-col-side">
+            <div class="iv-top-row">
+                <div class="iv-zoom-box">
+                    <div class="iv-zoom-title">zoom</div>
+                    <canvas id="iv-zoom" class="iv-canvas-zoom"></canvas>
+                </div>
+                <pre id="iv-info" class="iv-info"></pre>
+            </div>
+
+            <div class="iv-curve-box">
+                <canvas id="iv-curva" class="iv-canvas-curva"></canvas>
+                <div id="iv-tooltip" class="iv-tooltip" hidden></div>
+            </div>
+
+            <div class="iv-controls">
+                <fieldset>
+                    <legend>background</legend>
+                    <label><input type="radio" name="iv-fundo" value="c" checked> c (column)</label>
+                    <label><input type="radio" name="iv-fundo" value="l"> l (row)</label>
+                </fieldset>
+                <fieldset>
+                    <legend>spot position</legend>
+                    <label><input type="radio" name="iv-metodo" value="fisico" checked> physical (1-2 clicks)</label>
+                    <label><input type="radio" name="iv-metodo" value="polinomio"> polynomial (IDL)</label>
+                </fieldset>
+                <div class="iv-buttons">
+                    <button type="button" id="iv-limpa" class="iv-btn">Clear points</button>
+                    <button type="button" id="iv-novo" class="iv-btn">New spot</button>
+                    <button type="button" id="iv-salva" class="iv-btn iv-btn-save">Save spot</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/iv.js') }}"></script>
+</body>
+</html>

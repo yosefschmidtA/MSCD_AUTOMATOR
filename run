@@ -1,31 +1,13 @@
 #!/bin/bash
 
-# MSCD AUTOMATOR - Management Script
-
-# --- DETECÇÃO AUTOMÁTICA DO DOCKER COMPOSE ---
-# 1. Tenta verificar se o novo "docker compose" (V2) existe
-if docker compose version &> /dev/null; then
-    COMPOSE_CMD="docker compose"
-# 2. Se não, tenta o antigo "docker-compose" (V1)
-elif command -v docker-compose &> /dev/null; then
-    COMPOSE_CMD="docker-compose"
-else
-    echo "❌ Erro: Nenhum Docker Compose encontrado."
-    echo "Instale 'docker-compose' ou o plugin 'docker compose'."
-    exit 1
-fi
-
-# Feedback visual para saber qual está usando
-echo "🔧 Usando gerenciador: $COMPOSE_CMD"
-echo "-----------------------------------"
-
 function usage() {
-    echo "Usage: ./run [option]"
-    echo "Options:"
-    echo "  build   - Build the Docker image"
-    echo "  prod    - Start the project in Production mode (Detached)"
-    echo "  down    - Stop and remove containers"
-    echo "  logs    - View real-time logs"
+    echo "Uso: ./run opcao"
+    echo "Opção pode assumir os seguintes valores:"
+    echo "  dev - executa o projeto no modo desenvolvimento (http://localhost:5000)"
+    echo "  prod - executa o projeto no modo produção (http://10.0.1.145:60010)"
+    echo "  build - compila o projeto e o contêiner Docker"
+    echo "  down - derruba os contêiners"
+    echo "  logs - exibe os logs da aplicação"
     exit 1
 }
 
@@ -35,25 +17,33 @@ if [[ -z "$OPTION" ]]; then
     usage
 fi
 
-if [[ $OPTION == "build" ]]; then
-    echo "Building MSCD Solver"
-    export DOCKER_BUILDKIT=1
-    # Substituímos o comando fixo pela variável $COMPOSE_CMD
-    $COMPOSE_CMD -f docker-compose.yml build
+# A omicron so tem o binario docker-compose, sem o plugin "docker compose".
+if docker compose version &> /dev/null; then
+    COMPOSE="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    COMPOSE="docker-compose"
+else
+    echo "Nenhum Docker Compose encontrado: instale o plugin 'docker compose' ou o 'docker-compose'."
+    exit 1
+fi
 
+if [[ $OPTION == "dev" ]]; then
+    echo "Executando a configuração de desenvolvimento..."
+    $COMPOSE -f compose.yml -f compose.dev.yml up -d
+    echo "Sucesso!"
 elif [[ $OPTION == "prod" ]]; then
-    echo "Starting MSCD"
-    $COMPOSE_CMD -f docker-compose.yml -f docker-compose.prod.yml up -d
-    echo "Accessible at http://10.0.1.145"
-
+    echo "Executando a configuração de produção..."
+    $COMPOSE -f compose.yml -f compose.prod.yml up -d
+    echo "Sucesso!"
 elif [[ $OPTION == "down" ]]; then
-    echo "Stopping MSCD Solver..."
-    $COMPOSE_CMD down --remove-orphans
-
+    echo "Parando a aplicação..."
+    $COMPOSE down --remove-orphans
+elif [[ $OPTION == "build" ]]; then
+    echo "Buildando os contêineres..."
+    export DOCKER_BUILDKIT=1
+    $COMPOSE -f compose.yml build
 elif [[ $OPTION == "logs" ]]; then
-    # Verifica logs do serviço. Se der erro no nome, tente apenas 'logs -f'
-    $COMPOSE_CMD logs -f mscd-solver
-
+    $COMPOSE logs -f
 else
     usage
 fi
