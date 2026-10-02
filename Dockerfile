@@ -46,5 +46,6 @@ EXPOSE 5000
 # Um processo so, com threads: o cache de imagens do IV Curve e a trava do MSCD
 # (simulacao_ativa, _trava_mscd) vivem na memoria do processo e nao se dividem
 # entre workers. As threads deixam um Load lento de uma pessoa nao travar os
-# cliques das outras.
-CMD ["gunicorn", "--workers", "1", "--threads", "8", "--timeout", "120", "--bind", "0.0.0.0:5000", "app:app"]
+# cliques das outras. O access log vai para o ./run logs: mostra se um pedido
+# chegou ao servidor e com que codigo saiu.
+CMD ["gunicorn", "--workers", "1", "--threads", "8", "--timeout", "120", "--bind", "0.0.0.0:5000", "--access-logfile", "-", "app:app"]

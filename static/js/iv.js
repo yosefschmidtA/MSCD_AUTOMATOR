@@ -40,6 +40,13 @@ function status(texto, erro = false) {
     $('iv-status').classList.toggle('iv-erro', erro);
 }
 
+// Erro que nao veio do app (sem JSON): o cabecalho Server diz quem respondeu.
+// O app responde com Server: gunicorn; outro valor, ou nenhum, e um proxy no
+// caminho de quem acessa.
+function erroHttp(codigo, server) {
+    return `HTTP ${codigo}, answered by ${server ? `"${server}"` : 'unknown server (no Server header)'}`;
+}
+
 function carrega() {
     const fd = new FormData();
     arquivosValidos($('iv-pasta-img'), RE_IMG).forEach(f => fd.append('imagens', f, f.name));
@@ -61,7 +68,8 @@ function carrega() {
         $('iv-progresso').hidden = true;
         $('iv-progresso-barra').style.width = '0';
         if (xhr.status !== 200) {
-            status((xhr.response && xhr.response.erro) || `Upload failed (HTTP ${xhr.status}).`, true);
+            status((xhr.response && xhr.response.erro)
+                   || `Upload failed (${erroHttp(xhr.status, xhr.getResponseHeader('Server'))}).`, true);
             return;
         }
         inicia(xhr.response);
@@ -150,7 +158,7 @@ async function post(rota, corpo) {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo),
     });
     if (!resp.ok) {
-        let msg = `HTTP ${resp.status}`;
+        let msg = erroHttp(resp.status, resp.headers.get('Server'));
         try { msg = (await resp.json()).erro || msg; } catch (_) { /* resposta sem JSON */ }
         throw new Error(msg);
     }
