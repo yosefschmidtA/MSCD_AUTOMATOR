@@ -62,6 +62,10 @@ def le_xml(caminho):
     for tag in ("BeamCurrent", "Energy"):
         m = re.search(rf"<{tag}>\s*([-\d.eE+]+)\s*</{tag}>", texto)
         valores[tag] = float(m.group(1)) if m else None
+    # Ha medidas gravadas com a corrente negativa (sinal do amperimetro);
+    # so o modulo importa para normalizar.
+    if valores["BeamCurrent"] is not None:
+        valores["BeamCurrent"] = abs(valores["BeamCurrent"])
     return valores
 
 
