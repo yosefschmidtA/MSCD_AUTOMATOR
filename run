@@ -27,6 +27,12 @@ else
     exit 1
 fi
 
+# Externa no compose.yml (ver o comentario la): o compose nao cria, entao cria aqui.
+REDE="mscd_automator_mscd-network"
+if [[ $OPTION == "dev" || $OPTION == "prod" ]]; then
+    docker network inspect "$REDE" &> /dev/null || docker network create "$REDE" > /dev/null
+fi
+
 if [[ $OPTION == "dev" ]]; then
     echo "Executando a configuração de desenvolvimento..."
     $COMPOSE -f compose.yml -f compose.dev.yml up -d
@@ -40,8 +46,13 @@ elif [[ $OPTION == "down" ]]; then
     $COMPOSE down --remove-orphans
 elif [[ $OPTION == "build" ]]; then
     echo "Buildando os contêineres..."
-    export DOCKER_BUILDKIT=1
-    $COMPOSE -f compose.yml build
+    # Na omicron o BuildKit guardou um DNS vazio no boot (o Docker subiu antes do
+    # resolv.conf) e falha em "lookup registry-1.docker.io on [::1]:53" ate o
+    # Docker ser reiniciado. O construtor classico usa o DNS atual.
+    if ! DOCKER_BUILDKIT=1 $COMPOSE -f compose.yml build; then
+        echo "Build com BuildKit falhou; tentando o construtor clássico..."
+        DOCKER_BUILDKIT=0 $COMPOSE -f compose.yml build
+    fi
 elif [[ $OPTION == "logs" ]]; then
     $COMPOSE logs -f
 else

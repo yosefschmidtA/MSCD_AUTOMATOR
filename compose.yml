@@ -9,3 +9,17 @@ services:
       - ./arquivos:/app/arquivos
     environment:
       TZ: America/Sao_Paulo
+    networks:
+      - mscd-network
+
+networks:
+  # Externa de proposito: o compose nunca apaga uma rede externa, nem no down.
+  # Na omicron o MPI de um pw.x que roda por dias escolheu a interface desta rede
+  # (172.18.0.1) para o controle dos processos; se o down a removesse, derrubaria
+  # a conta. Fica aqui, e nao so no compose.prod.yml, porque um down que carrega
+  # so o compose.yml apaga as redes com o rotulo do projeto -- e esta foi criada
+  # pelo compose, com rotulo. O nome e o da rede que ja existe la; o ./run cria a
+  # rede quando ela falta (maquina nova, dev).
+  mscd-network:
+    external: true
+    name: mscd_automator_mscd-network
