@@ -50,14 +50,14 @@
                 <label id="iv-ck-corrente-label"><input type="checkbox" id="iv-ck-corrente"> divide by beam current</label>
                 <label><input type="checkbox" id="iv-ck-suave"> smooth (3-point average)</label>
             </div>
-            <p class="iv-help">Set the energy range of the spot first &middot; left click: mark the spot center at this energy &middot; right click: delete it &middot;
+            <p class="iv-help">Set the energy range of the spot first &middot; left click: mark the spot center at this energy (on the zoom: exactly at that pixel) &middot; right click: delete it &middot;
                 &larr; / &rarr; or mouse wheel: change energy &middot; click on the curve: jump to that energy</p>
         </div>
 
         <div class="iv-col-side">
             <div class="iv-top-row">
                 <div class="iv-zoom-box">
-                    <div class="iv-zoom-title">zoom</div>
+                    <div class="iv-zoom-title">zoom &middot; click to place the point exactly</div>
                     <canvas id="iv-zoom" class="iv-canvas-zoom"></canvas>
                 </div>
                 <pre id="iv-info" class="iv-info"></pre>
@@ -73,6 +73,14 @@
                     <legend>energy range (eV)</legend>
                     <label class="iv-faixa">from <input type="number" id="iv-emin" min="0" step="1"></label>
                     <label class="iv-faixa">to <input type="number" id="iv-emax" min="0" step="1"></label>
+                </fieldset>
+                <fieldset>
+                    <legend>window (px)</legend>
+                    <div class="iv-janela">
+                        <button type="button" id="iv-janela-menos" class="iv-btn" title="Smaller window">&minus;</button>
+                        <input type="number" id="iv-janela" min="3" max="99" step="2">
+                        <button type="button" id="iv-janela-mais" class="iv-btn" title="Larger window">+</button>
+                    </div>
                 </fieldset>
                 <fieldset>
                     <legend>background</legend>

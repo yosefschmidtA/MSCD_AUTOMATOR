@@ -137,6 +137,9 @@ def marca(sessao, energia, x, y):
 def calcula(sessao, ancoras, metodo, fundo, largura, centro=None, emin=None, emax=None):
     """Trajetoria e intensidade; mesmas regras e mensagens do Coleta.recalcula."""
     d = _pasta(sessao)
+    # A janela agora vem da tela (botoes - / +); impar para ter um pixel central.
+    if not (3 <= largura <= 99 and largura % 2):
+        raise ErroIV("The window must be an odd number of pixels from 3 to 99.")
     imagens = _faixa(_imagens(d), emin, emax)
     # Marcacao fora da faixa nao entra no ajuste (o navegador ja as descarta).
     ancoras = {e: a for e, a in _ancoras(ancoras).items() if e in imagens}

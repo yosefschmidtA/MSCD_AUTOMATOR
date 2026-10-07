@@ -93,6 +93,7 @@ function inicia(r) {
     });
     $('iv-emin').value = S.emin;
     $('iv-emax').value = S.emax;
+    $('iv-janela').value = S.largura;
     let txt = `${r.energias.length} energies loaded (${r.energias[0]} to ${r.energias.at(-1)} eV).`;
     if (r.sem_xml.length) {
         txt += ` ${r.sem_xml.length} without beam current in the XML: normalization by current disabled.`;
@@ -274,6 +275,9 @@ function desenhaImagem(im) {
     }
 }
 
+// Meia largura do recorte do zoom, em pixels da imagem (cresce com a janela).
+const raioZoom = () => 20 + Math.floor(S.largura / 2);
+
 function desenhaZoom(im) {
     const cv = $('iv-zoom');
     const larg = cv.clientWidth;
@@ -284,7 +288,7 @@ function desenhaZoom(im) {
         cx.fillRect(0, 0, larg, larg);
         return;
     }
-    const z = 20 + Math.floor(S.largura / 2);
+    const z = raioZoom();
     const n = 2 * z + 1;
     const cc = roundIdl(c[0]), cl = roundIdl(c[1]);
     // Fora da imagem conta como 0, como o np.pad do leed_iv.py.
@@ -585,6 +589,45 @@ async function cliqueImagem(ev) {
     recalcula();
 }
 
+// Clique no zoom: o pixel clicado vira a marcacao, sem puxar para o pico (o
+// pico_local do clique na imagem grande brigaria com quem esta corrigindo a mao).
+function cliqueZoom(ev) {
+    const c = centroAtual();
+    if (!S.sessao || !c) return;
+    const r = $('iv-zoom').getBoundingClientRect();
+    const z = raioZoom();
+    const s = r.width / (2 * z + 1);
+    // Mesma convencao do desenho: o pixel k do recorte ocupa k*s a (k+1)*s.
+    const x = roundIdl(c[0]) - z + (ev.clientX - r.left) / s - 0.5;
+    const y = roundIdl(c[1]) - z + (ev.clientY - r.top) / s - 0.5;
+    const [ny, nx] = S.forma;
+    const e = energiaAtual();
+    if (ev.button === 0) {
+        const px = roundIdl(x), py = roundIdl(y);
+        if (px < 0 || py < 0 || px > nx - 1 || py > ny - 1) return;
+        S.ancoras[e] = [px, py];
+    } else if (ev.button === 2) {
+        delete S.ancoras[e];
+    } else {
+        return;
+    }
+    desenha();
+    recalcula();
+}
+
+function mudaJanela(v) {
+    if (!S.sessao) return;
+    v = Math.round(Number(v));
+    if (!Number.isFinite(v)) v = S.largura;
+    if (v % 2 === 0) v += v > S.largura ? 1 : -1;  // impar: tem um pixel central
+    v = Math.max(3, Math.min(99, v));
+    $('iv-janela').value = v;
+    if (v === S.largura) return;
+    S.largura = v;
+    desenha();
+    recalcula();
+}
+
 async function salva() {
     if (!Object.keys(S.inten).length) {
         S.mensagem = 'Nothing to save: mark the spot first.';
@@ -636,6 +679,11 @@ function liga() {
     const cvImg = $('iv-img');
     cvImg.addEventListener('mousedown', cliqueImagem);
     cvImg.addEventListener('contextmenu', ev => ev.preventDefault());
+    $('iv-zoom').addEventListener('mousedown', cliqueZoom);
+    $('iv-zoom').addEventListener('contextmenu', ev => ev.preventDefault());
+    $('iv-janela').addEventListener('change', ev => mudaJanela(ev.target.value));
+    $('iv-janela-menos').addEventListener('click', () => mudaJanela(S.largura - 2));
+    $('iv-janela-mais').addEventListener('click', () => mudaJanela(S.largura + 2));
 
     const roda = ev => {
         if (!S.sessao) return;
