@@ -134,6 +134,17 @@ def marca(sessao, energia, x, y):
     return [float(core.round_idl(c)), float(core.round_idl(l))]
 
 
+def _trechos(energias):
+    """[30, 32, 34, 80] -> "30 to 34, 80" (passo das energias carregadas)."""
+    partes, ini = [], 0
+    for k in range(1, len(energias) + 1):
+        if k == len(energias) or energias[k] - energias[k - 1] > energias[1] - energias[0]:
+            a, b = energias[ini], energias[k - 1]
+            partes.append(f"{a}" if a == b else f"{a} to {b}")
+            ini = k
+    return ", ".join(partes)
+
+
 def calcula(sessao, ancoras, metodo, fundo, largura, centro=None, emin=None, emax=None):
     """Trajetoria e intensidade; mesmas regras e mensagens do Coleta.recalcula."""
     d = _pasta(sessao)
@@ -154,13 +165,26 @@ def calcula(sessao, ancoras, metodo, fundo, largura, centro=None, emin=None, ema
         pos = core.trajetoria(imagens, ancoras, metodo, largura, centro=centro)
     except ValueError as erro:
         return {"mensagem": str(erro)}
-    inten = core.curva(imagens, pos, fundo, largura)
+    # Spot perto da borda: em energia baixa ele se afasta do centro e a posicao
+    # prevista pode cair fora da imagem. A janela ali e vazia (o intensidade quebrava
+    # com IndexError); essas energias ficam sem intensidade e a tela avisa.
+    ny, nx = core.carrega_cinza(next(iter(imagens.values()))).shape
+    fora = [e for e, (c, l) in pos.items()
+            if not (0 <= core.round_idl(c) < nx and 0 <= core.round_idl(l) < ny)]
+    dentro = {e: p for e, p in pos.items() if e not in fora}
+    inten = core.curva(imagens, dentro, fundo, largura)
     resposta = {
         "pos": {e: list(p) for e, p in pos.items()},
         "inten": inten,
         "mensagem": (f"{len(ancoras)} point(s) marked. Check the green square along the "
                      "energies; if it leaves the spot, click on the spot there."),
     }
+    if fora:
+        resposta["fora"] = fora
+        sugestao = (f" Set the energy range to {min(dentro)} to {max(dentro)} eV."
+                    if dentro and fora == [e for e in pos if e < min(dentro) or e > max(dentro)] else "")
+        resposta["mensagem"] = (f"The spot is outside the image at {_trechos(fora)} eV; "
+                                f"those energies are left out of the curve.{sugestao}")
     if metodo == "fisico" and len(ancoras) >= 2:
         # Depois de gravar, o navegador guarda isto e o proximo spot sai com 1 clique.
         cc, _, cl, _ = core.ajusta_fisico(ancoras)
@@ -182,6 +206,9 @@ def salva(sessao, nome, ancoras, metodo, fundo, largura, suavizar, centro=None, 
     r = calcula(sessao, ancoras, metodo, fundo, largura, centro, emin, emax)
     if "pos" not in r:
         raise ErroIV("Nothing to save: mark the spot first.")
+    if r.get("fora"):
+        # Nao grava curva com buraco sem a pessoa decidir: ela acerta a faixa antes.
+        raise ErroIV(r["mensagem"])
     pos, inten_d = r["pos"], r["inten"]
 
     es = energias

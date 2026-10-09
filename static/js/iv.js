@@ -363,8 +363,9 @@ const maximo = v => Math.max(...v.filter(Number.isFinite));
 
 // Curvas como {es, y}: cada spot tem a sua faixa de energia.
 function curvaAtual() {
-    const es = faixa();
-    if (!es.length || !es.every(e => e in S.inten)) return null;
+    // Energias em que o spot cai fora da imagem vem sem intensidade: ficam de fora.
+    const es = faixa().filter(e => e in S.inten);
+    if (!es.length) return null;
     let y = es.map(e => S.inten[e]);
     if (S.normalizar && temCorrenteFaixa(es)) y = y.map((v, k) => v / S.xml[es[k]].BeamCurrent);
     if (S.suavizar) y = suaviza3(y);
